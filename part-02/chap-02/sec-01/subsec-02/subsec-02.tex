@@ -1,0 +1,46 @@
+\subsubsection{1.2. Mô hình MGAT + FastKAN/MLP}
+
+\begin{figure}[H]
+    \centering
+    \scalebox{0.4}{\includegraphics[width=\linewidth]{images/part-02/chap-02/sec-01/Pipeline.jpg}}
+    \vspace{0.3cm}
+    \caption{Kiến trúc tổng quát của mô hình CNN backbone + MGAT + FastKAN/MLP}
+    \label{fig:KTPipeline}
+\end{figure}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=\linewidth]{images/part-02/chap-02/sec-01/ViDuDoThi.jpg}
+    \vspace{0.3cm}
+    \caption{\centering Ví dụ về cách xây dựng đồ thị và dự đoán nhãn khi dùng mô hình CNN backbone + MGAT + FastKAN/MLP}
+    \label{fig:VDPipeline}
+\end{figure}
+
+% \indent\indent Kiến trúc của mô hình gồm 5 tầng được mô tả tổng quát qua \textbf{Hình} \ref{fig:KTPipeline} và có ví dụ cụ thể ở \textbf{Hình} \ref{fig:VDPipeline}, trong đó mỗi tầng làm nhiệm vụ cụ thể như sau:
+% \begin{itemize}
+%     \item \textbf{Extract Features Layers:} Tầng dùng để trích xuất đặc trưng riêng biệt cho từng loại phương thức, như ví dụ ở \textbf{Hình} \ref{fig:VDPipeline}, khi đồ thị ban đầu đi qua tầng này, ta được các đặc trưng ở không gian khác nhau tuỳ thuộc phương thức của nút đó (nút màu vàng là hình ảnh, nút màu xanh lá là văn bản, nút màu xanh dương là âm thanh).
+%     \item \textbf{Share Projection Layer:} Tầng biến đổi không gian từ các phương thức khác nhau về cùng một không gian chung để chúng được biểu diễn một cách thống nhất.
+%     \item \textbf{Edge Weight Layer}: Tầng này dùng các vector ở các nút do Share Projection Layer sinh ra để tiến hành tính trọng số trên cạnh, là một bộ trọng số vô hướng có giá trị từ $[-1, 1]$, nhằm mục tiêu là học mối quan hệ "bạn bè" (trọng số cạnh dương) hoặc "đối kháng" (trọng số cạnh âm) giữa các nút.
+%     \item \textbf{GAT Layer}: Tầng ứng dụng GAT để tổng hợp vector mới cho các nút từ thông tin các nút hàng xóm của nó, ở đây ta chỉ xét các hàng xóm thuộc nhóm "bạn bè", vì chúng là những hàng xóm mang thông tin bổ sung cần thiết cho nút hiện tại.
+%     \item \textbf{FastKAN/MLP Classifier}: Tầng này sử dụng vector mới từ GAT Layer để tiến hành phân lớp, bằng cách đem các nút đi dự đoán, và cộng trung bình dự đoán có trọng số của các nút (bằng cách Graph Weight từ tầng Edge Weight Layer) nhằm tăng tính linh hoạt của mô hình, mỗi nút sẽ có đóng góp khác nhau vào kết quả cuối cùng.
+% \end{itemize}
+
+\indent\indent Kiến trúc của mô hình gồm 5 tầng, được mô tả tổng quát trong \textbf{Hình} \ref{fig:KTPipeline} và được minh hoạ cụ thể qua \textbf{Hình} \ref{fig:VDPipeline}. Mỗi tầng đảm nhận một vai trò riêng trong toàn bộ pipeline, cụ thể như sau:
+\begin{itemize}[label={--}, itemsep=1pt]
+    \item \textbf{Extract Features Layers:} Tầng này có nhiệm vụ trích xuất đặc trưng riêng cho từng loại phương thức dữ liệu. Như minh hoạ trong \textbf{Hình} \ref{fig:VDPipeline}, khi đồ thị ban đầu đi qua tầng này, các nút sẽ được ánh xạ sang những không gian đặc trưng khác nhau tuỳ theo phương thức của chúng (nút màu vàng biểu diễn hình ảnh, nút màu xanh lá biểu diễn văn bản, và nút màu xanh dương biểu diễn âm thanh).
+    
+    \item \textbf{Share Projection Layer:} Tầng này thực hiện phép chiếu các đặc trưng từ những không gian phương thức khác nhau về một không gian biểu diễn chung, nhằm đảm bảo các nút được biểu diễn một cách thống nhất và có thể so sánh trực tiếp với nhau.
+    
+    \item \textbf{Edge Weight Layer}: Dựa trên các vector biểu diễn của nút do Share Projection Layer sinh ra, tầng này học và tính toán trọng số cho các cạnh trong đồ thị. Trọng số cạnh là một giá trị nằm trong đoạn $[-1, 1]$, phản ánh mức độ quan hệ giữa các nút, trong đó trọng số dương biểu thị mối quan hệ "bạn bè", còn trọng số âm biểu thị mối quan hệ "đối kháng".
+    
+    \item \textbf{GAT Layers}: Tầng này áp dụng GAT để tổng hợp và cập nhật biểu diễn mới cho mỗi nút dựa trên thông tin từ các nút hàng xóm. Trong quá trình này, mô hình chỉ xét các hàng xóm có trọng số cạnh dương (nhóm "bạn bè"), vì đây là những nút cung cấp thông tin bổ trợ hữu ích cho nút đang xét.
+    
+    \item \textbf{FastKAN/MLP Classifier}: Tầng này sử dụng các vector đã được cập nhật từ GAT Layer để thực hiện phân lớp. Đầu tiên, mô hình tiến hành dự đoán trên từng nút và sau đó tổng hợp kết quả bằng cách lấy trung bình có trọng số, trong đó trọng số được xác định bởi Graph Weight từ Edge Weight Layer. Phương pháp này giúp tăng tính linh hoạt của mô hình, cho phép mỗi nút đóng góp khác nhau vào kết quả dự đoán cuối cùng.
+\end{itemize}
+
+
+\input{part-02/chap-02/sec-01/subsec-02/sss-01}
+\input{part-02/chap-02/sec-01/subsec-02/sss-02}
+\input{part-02/chap-02/sec-01/subsec-02/sss-03}
+\input{part-02/chap-02/sec-01/subsec-02/sss-04}
+\input{part-02/chap-02/sec-01/subsec-02/sss-05}

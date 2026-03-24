@@ -1,0 +1,17 @@
+\subsubsection{2.8. Framework web}
+\indent\indent Để xây dựng một hệ thống tích hợp mô hình học sâu với giao diện người dùng tương tác cao, kiến trúc ứng dụng được chia thành hai phần chính: frontend sử dụng Angular và backend sử dụng FastAPI.\vspace{0.3cm}
+
+Angular\footnote{\url{https://angular.dev/}} là một framework front-end mã nguồn mở được phát triển và duy trì bởi Google, sử dụng TypeScript làm ngôn ngữ chính và hướng đến việc xây dựng các ứng dụng web một trang (Single Page Application – SPA). Angular là bản tái thiết kế hoàn chỉnh của AngularJS, mang lại một nền tảng hiện đại với cấu trúc dự án rõ ràng, hỗ trợ tốt cho các ứng dụng quy mô lớn, phức tạp và dễ mở rộng hơn so với các phiên bản trước.\vspace{0.3cm}
+
+Trong các phiên bản gần đây (như Angular 16 trở lên), framework này đã đưa vào một số cải tiến trọng tâm cho mô hình reactivity thông qua cơ chế Signals, giúp quản lý trạng thái và cập nhật giao diện hiệu quả hơn so với các cách tiếp cận truyền thống như Zone.js. Đây là một bước tiến quan trọng trong thiết kế kiến trúc của Angular, hướng tới trải nghiệm phát triển linh hoạt, tối ưu hiệu suất và dễ bảo trì.\vspace{0.3cm}
+
+Ưu điểm nổi bật của Angular so với các framework như React hay Vue nằm ở tính nguyên khối và định hướng kiến trúc rõ ràng. Angular cung cấp sẵn một hệ sinh thái đồng bộ bao gồm cơ chế định tuyến (routing), HTTP client, quản lý và kiểm tra dữ liệu biểu mẫu (form validation), cùng hệ thống dependency injection mạnh mẽ. Cách tiếp cận này giúp chuẩn hóa cấu trúc dự án, giảm sự phụ thuộc vào các thư viện bên ngoài và nâng cao tính nhất quán trong quá trình phát triển. Nhờ đó, Angular đặc biệt phù hợp với các hệ thống doanh nghiệp quy mô lớn, nơi yêu cầu cao về khả năng bảo trì, mở rộng và ổn định lâu dài.\vspace{0.3cm}
+
+Về phần backend, FastAPI\footnote{\url{https://fastapi.tiangolo.com/}} thường được lựa chọn nhờ hiệu năng vượt trội và khả năng tương thích hoàn hảo với hệ sinh thái Python (ngôn ngữ bản ngữ của AI/Machine Learning).\vspace{0.3cm}
+
+FastAPI được xây dựng trên chuẩn ASGI (Asynchronous Server Gateway Interface), cho phép xử lý bất đồng bộ các yêu cầu đồng thời, giúp giảm độ trễ khi mô hình AI thực hiện suy luận. Điểm mạnh của FastAPI bao gồm:\vspace{-0.1cm}
+\begin{itemize}[label={--}, itemsep=1pt]
+    \item Hiệu suất cao: Tốc độ xử lý ngang ngửa với NodeJS và Go, nhờ sử dụng Starlette cho phần web và Pydantic cho phần validation dữ liệu.
+    \item Tích hợp AI dễ dàng: Vì chạy trên Python, FastAPI có thể gọi trực tiếp các thư viện PyTorch, TensorFlow hay các mô hình HuggingFace mà không cần qua các cầu nối ngôn ngữ phức tạp.
+    \item Tự động hóa tài liệu: Tự động sinh tài liệu API chuẩn OpenAPI (Swagger UI), giúp việc giao tiếp giữa đội ngũ phát triển frontend và AI engineer trở nên dễ dàng.
+\end{itemize}

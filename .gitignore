@@ -1,0 +1,40 @@
+## Các file phụ của LaTeX (Auxiliary files)
+*.aux
+*.fdb_latexmk
+*.fls
+*.log
+*.out
+*.toc
+*.synctex.gz
+
+## Các file cho mục lục và danh sách (Listings/Index)
+*.lof
+*.lot
+*.idx
+*.ind
+*.ilg
+*.bbl
+*.blg
+*.brf
+*.nav
+*.snm
+*.vrb
+
+## File tạm của các gói cụ thể (ví dụ: biblatex, glossaries)
+*.bcf
+*.run.xml
+*.ist
+*.glo
+*.gls
+*.glg
+
+## File PDF đầu ra (Tùy chọn)
+# Thông thường không nên lưu PDF vào Git vì nó thay đổi liên tục. 
+# Xóa dấu # bên dưới nếu bạn muốn Git lờ đi file PDF.
+# *.pdf
+
+## Backup và file tạm của trình soạn thảo
+*.bak
+*.sav
+*.swp
+*~
