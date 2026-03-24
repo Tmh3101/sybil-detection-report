@@ -1,0 +1,20 @@
+name: Compile LaTeX
+on: [push] # Chạy mỗi khi bạn push code lên GitHub
+
+jobs:
+  build_latex:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Set up Git repository
+        uses: actions/checkout@v4
+
+      - name: Compile LaTeX document
+        uses: xu-cheng/latex-action@v3
+        with:
+          root_file: main.tex # Thay 'main.tex' bằng tên file chính của bạn
+
+      - name: Upload PDF artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: PDF_Output
+          path: main.pdf # Thay 'main.pdf' bằng tên file kết quả của bạn
