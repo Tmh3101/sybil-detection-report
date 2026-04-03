@@ -8,7 +8,9 @@
     
     \item \textbf{Học không giám sát và tự động gán nhãn:} Khắc phục bài toán thiếu nhãn thực tế thông qua một quy trình tự động hóa. Ứng dụng bộ mã hóa tự động đồ thị (GAE) kết hợp kiến trúc GATv2 để học biểu diễn nút, tiếp nối bằng thuật toán phân cụm K-Means và hệ thống luật chuyên gia để gán nhãn giả lập phân loại 4 mức độ rủi ro.
     
-    \item \textbf{Tối ưu hóa phân lớp bằng kiến trúc tách rời (Decoupled ML):} Thực hiện nghiên cứu loại trừ toàn diện trên 20 tổ hợp mô hình, kết hợp giữa 5 kiến trúc GNN tiên tiến (GAT, GCN, PNA,...) và 4 thuật toán máy học truyền thống (Random Forest, XGBoost,...). Mục tiêu nhằm vượt qua giới hạn "hộp đen" và đạt được điểm số Macro F1 vượt trội.
+    \item \textbf{Huấn luyện và đánh giá các mô hình GNN thuần (End-to-End):} Xây dựng và khảo sát hiệu năng của 5 kiến trúc mạng nơ-ron đồ thị tiên tiến bao gồm GAT, GCN, GINE, PNA và Transformer. Mục tiêu của bước này là đánh giá khả năng học biểu diễn và phân lớp trực tiếp của các mô hình trên cấu trúc đồ thị đa quan hệ.
     
-    \item \textbf{Phát triển và triển khai hệ thống ứng dụng thực tiễn:} Đóng gói mô hình thành một ứng dụng web hoàn chỉnh (sử dụng Next.js, FastAPI, Modal). Hệ thống cung cấp tính năng tra cứu điểm rủi ro qua định danh tài khoản, hoặc thực thi toàn bộ luồng trên một khoảng thời gian tùy chọn. Giao diện tích hợp khả năng trực quan hóa đồ thị cục bộ và biểu đồ diễn giải nguyên nhân rủi ro, đảm bảo tính minh bạch cho người dùng cuối.
+    \item \textbf{Tối ưu hóa và đánh giá với kiến trúc tách rời (Decoupled ML):} Thực hiện nghiên cứu loại trừ quy mô lớn trên 20 tổ hợp mô hình bằng cách sử dụng không gian nhúng trích xuất từ 5 kiến trúc GNN trên đưa vào 4 thuật toán máy học truyền thống (KNN, Linear SVC, Random Forest, XGBoost). Mục tiêu nhằm vượt qua giới hạn "hộp đen" của mạng nơ-ron đồ thị và đạt được điểm số Macro F1 vượt trội.
+    
+    \item \textbf{Phát triển ứng dụng web:} Đóng gói mô hình thành một ứng dụng web hoàn chỉnh (sử dụng Next.js, FastAPI, Modal). Hệ thống cung cấp tính năng tra cứu điểm rủi ro qua định danh tài khoản, hoặc thực thi toàn bộ luồng trên một khoảng thời gian tùy chọn. Giao diện tích hợp khả năng trực quan hóa đồ thị cục bộ và biểu đồ diễn giải nguyên nhân rủi ro, đảm bảo tính minh bạch cho người dùng cuối.
 \end{itemize}
