@@ -1,24 +1,23 @@
-\subsubsection{2.3. Đặc trưng MFCC của âm thanh}
-\indent\indent Trong xử lý tín hiệu âm thanh và nhận dạng tiếng nói, việc trích xuất đặc trưng là bước chuyển đổi tín hiệu miền thời gian sang miền tần số rút gọn, giúp mô hình loại bỏ các nhiễu nền và tập trung vào các thành phần mang thông tin ngữ nghĩa. Phương pháp phổ biến và hiệu quả nhất hiện nay là sử dụng Mel-Frequency Cepstral Coefficients (MFCC) kết hợp với các đặc trưng động của chúng.\vspace{0.3cm}
+\subsubsection{2.3. Đồ thị đa quan hệ nhận thức ràng buộc (Constraint-Aware Graph)}
+\indent\indent Trong các hệ thống mạng xã hội Web3, dữ liệu không chỉ dừng lại ở các thuộc tính đơn lẻ của người dùng mà còn nằm ở mạng lưới các mối quan hệ dày đặc giữa các thực thể. Để phát hiện hiệu quả các hành vi dị thường, nghiên cứu chuyển đổi dữ liệu phẳng thành cấu trúc đồ thị đa quan hệ (Multi-relational Graph) nhận thức ràng buộc. Theo Akoglu và cộng sự \cite{akoglu2015graph}, việc khai thác đồng thời các ràng buộc về mặt cấu trúc và quan hệ là yếu tố then chốt để bóc tách các mẫu hành vi có tính tổ chức của các thực thể độc hại trong môi trường mạng phức tạp.\vspace{0.3cm}
 
-MFCC \cite{davis1980comparison} được thiết kế dựa trên đặc điểm sinh lý học của tai người. Tai người không cảm nhận tần số theo tuyến tính mà theo thang đo logarit (nhạy cảm hơn với sự thay đổi ở tần số thấp và kém nhạy cảm hơn ở tần số cao).\vspace{0.3cm}
-
-Quy trình trích xuất MFCC bao gồm các bước: Tín hiệu âm thanh được chia thành các khung (frames) ngắn (thường 20-30ms), rồi áp dụng biến đổi Fourier, sau đó đi qua một bộ lọc (Filterbank) được phân bố theo thang đo Mel. Mối quan hệ giữa tần số Hertz ($f$) và tần số Mel ($m$) được mô tả qua công thức:\vspace{-0.1cm}
-\[
-    m = 2595 \log_{10}\left(1 + \frac{f}{700}\right)
-\]
-
-Cuối cùng, phép biến đổi cosine rời rạc được áp dụng lên log năng lượng của các bộ lọc để tạo ra các hệ số MFCC, giúp loại bỏ sự tương quan giữa các chiều dữ liệu.\vspace{0.3cm}
-
-Điểm đặc trưng của MFCC là chỉ biểu diễn được các đặc trưng quang phổ tĩnh (static spectral features) của một khung tại một thời điểm, bỏ qua tính chất thay đổi theo thời gian của tín hiệu âm thanh. Để khắc phục điều này, Furui \cite{furui1986speaker} đã giới thiệu việc sử dụng các đạo hàm bậc một và bậc hai của chuỗi MFCC:\vspace{-0.1cm}
+Hệ thống \textbf{SybilSignal} mô hình hóa dữ liệu thành đồ thị với 4 tầng quan hệ phân biệt. Mỗi tầng được thiết lập một trọng số cơ sở ($W_{base}$) khác nhau, phản ánh chi phí hành vi và mức độ tin cậy của mối quan hệ:\vspace{-0.1cm}
 \begin{itemize}[label={--}, itemsep=1pt]
-    \item Delta: Là đạo hàm bậc một của MFCC, biểu diễn vận tốc thay đổi của các hệ số cepstral giữa các khung liên tiếp. Công thức tính hệ số Delta $d_t$ tại thời điểm $t$ thường được tính bằng hồi quy tuyến tính trên một cửa sổ ngắn $N$:
-    \[
-        d_t = \frac{\sum_{n=1}^{N} n (c_{t+n} - c_{t-n})}{2 \sum_{n=1}^{N} n^2}
-    \]
-    Trong đó $c_t$ là hệ số MFCC tại thời điểm $t$.
-    
-    \item Delta-Delta: Là đạo hàm bậc hai của MFCC (hay đạo hàm của Delta), đại diện cho gia tốc hay sự thay đổi của Delta theo thời gian.
+    \item \textbf{Tầng theo dõi ($W_{base} = 1$):} Biểu diễn quan hệ mạng xã hội cơ bản. Đây là tầng có độ nhiễu cao nhất vì các tài khoản ảo có thể dễ dàng thiết lập kết nối này với chi phí thấp nhằm thao túng thuật toán đề xuất.
+    \item \textbf{Tầng tương tác ($W_{base} = 2$):} Gộp chung các hành vi tạo ra giá trị nội dung hoặc yêu cầu chi phí (Upvote, Comment, Collect, Quote, Tip và các chiều ngược lại). Việc gộp nhóm này giúp mô hình GNN tập trung vào "cường độ tương tác" thay vì bị phân mảnh bởi quá nhiều loại cạnh khác nhau.
+    \item \textbf{Tầng Tương đồng ($W_{base} = 5$):} Nhằm mục tiêu xác định dấu vết của các Sybil vốn thường có hành vi rập khuôn trong việc thiết lập hồ sơ. Để đảm bảo độ chính xác và giảm thiểu các liên kết nhiễu, nghiên cứu áp dụng nguyên tắc \textbf{ràng buộc 2/3}. Theo đó, một cạnh tương đồng chỉ được thiết lập giữa hai tài khoản nếu chúng vi phạm đồng thời ít nhất 2 trong 3 tiêu chí sau:\vspace{-0.1cm}
+    \begin{itemize}[label={+}, itemsep=0pt]
+        \item \textit{Tương đồng tiểu sử:} Đạt ngưỡng cao về độ tương đồng Cosine giữa các vector nhúng của tiểu sử.
+        \item \textit{Tương đồng tên định danh:} Tên định danh có khoảng cách chuỗi (Edit Distance) nằm trong phạm vi biến đổi nhỏ, cho thấy dấu hiệu của việc sinh tên tự động.
+        \item \textit{Tương đồng thời gian tạo tài khoản:} Các tài khoản được khởi tạo trong cùng một cụm thời gian ngắn, phản ánh hành vi tạo tài khoản hàng loạt bằng công cụ.
+    \end{itemize}
+    \item \textbf{Tầng Đồng sở hữu ($W_{base} = 10$):} Ràng buộc mạnh mẽ nhất về mặt kỹ thuật và tài chính, biểu diễn quan hệ các tài khoản được quản lý bởi cùng một địa chỉ ví Web3. Đây là bằng chứng thép để xác định các nhóm Sybil do một thực thể duy nhất điều khiển.
 \end{itemize}
 
-Trong thực nghiệm, một vector đặc trưng âm thanh hoàn chỉnh thường là sự kết hợp của ba thành phần này. Ví dụ, nếu sử dụng 13 hệ số MFCC đầu tiên, kết hợp với 13 hệ số Delta và 13 hệ số Delta-Delta, ta sẽ thu được một vector đặc trưng 39 chiều cho mỗi khung thời gian, nắm bắt đầy đủ cả thông tin phổ âm và động lực học của tín hiệu.
+Một thách thức đặc thù trong phân tích đồ thị mạng xã hội là sự tồn tại của các nút siêu đặc — những tài khoản sở hữu hàng chục nghìn kết nối — và các cụm siêu đặc — nơi các tài khoản hình thành mạng lưới liên kết chằng chịt, tương tác chéo với cường độ cao. Nếu chỉ sử dụng trọng số tuyến tính, khối lượng tín hiệu khổng lồ phát ra từ các cấu trúc này sẽ lấn át hoàn toàn luồng truyền tin (message passing) của toàn mạng lưới. Hậu quả là mạng GNN sẽ nhanh chóng rtrở nên quá mịn, khiến vector đặc trưng của các nút trở nên giống hệt nhau và mất đi khả năng phân loại. Để giải quyết triệt để vấn đề này, đề tài áp dụng cơ chế chuẩn hóa trọng số logarit:
+
+\begin{equation}
+    W_{final} = W_{base} \times \log(1 + \text{count})
+\end{equation}
+
+Trong đó \textit{count} là tần suất hành vi hoặc cường độ tương tác giữa hai nút. Phương pháp này có sự tương đồng mật thiết với cơ chế \textit{logarithmic scalers} trong kiến trúc mạng PNA \cite{corso2020principal}, giúp nén các giá trị cực đại và đảm bảo sự cân bằng trong quá trình học đặc trưng. Sự kết hợp giữa đồ thị đa tầng và cơ chế trọng số nhận thức ràng buộc cung cấp một tín hiệu giàu thông tin, giúp mô hình bóc trần cấu trúc bầy đàn tinh vi của các mạng lưới Sybil.

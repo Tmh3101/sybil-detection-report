@@ -1,28 +1,20 @@
-\subsubsection{2.2. Mô hình embedding câu (Sentence Transformer)}
-\indent\indent Trong các bài toán xử lý ngôn ngữ tự nhiên (NLP) hiện đại, việc chuyển đổi văn bản thành các vector số thực (embeddings) là bước tiên quyết để máy tính có thể hiểu và xử lý ngữ nghĩa. Khác với các phương pháp truyền thống như Bag-of-Words hay TF-IDF dựa trên tần suất từ, các mô hình embedding hiện đại ánh xạ văn bản vào một không gian vector, nơi các câu có ngữ nghĩa tương đồng sẽ nằm gần nhau về mặt hình học.\vspace{0.3cm}
+\subsubsection{2.2. Bộ mã hóa tự động đồ thị (Graph Autoencoder – GAE)}
+\indent\indent Trong môi trường mạng xã hội phi tập trung, thách thức lớn nhất đối với việc huấn luyện các mô hình học sâu là sự thiếu hụt nghiêm trọng dữ liệu nhãn về các tài khoản giả mạo. Để giải quyết vấn đề này, nghiên cứu áp dụng cơ chế học biểu diễn không giám sát (Unsupervised Representation Learning) thông qua bộ mã hóa tự động đồ thị (Graph Autoencoder – GAE), như được minh họa cụ thể trong Hình \ref{fig:GAE}. Phương pháp này, được đề xuất bởi Kipf và Welling \cite{kipf2016variational}, cho phép mô hình tự tìm ra các đặc điểm cấu trúc tiềm ẩn và quy luật phân phối của các nhóm tài khoản dựa trên dữ liệu thô mà không cần sự can thiệp của nhãn thủ công.\vspace{0.3cm}
 
-Mặc dù các mô hình ngôn ngữ lớn như BERT (Bidirectional Encoder Representations from Transformers) đạt hiệu quả cao trong nhiều tác vụ, chúng lại không tối ưu cho việc tạo ra vector biểu diễn ở cấp độ câu (sentence embeddings). Để giải quyết vấn đề này, Reimers và Gurevych \cite{reimers2019sentencebertsentenceembeddingsusing} đã giới thiệu Sentence-BERT (SBERT), một sửa đổi của kiến trúc BERT sử dụng Siamese networks để trích xuất các đặc trưng ngữ nghĩa.\vspace{0.3cm}
+Về mặt toán học, GAE hoạt động dựa trên hai thành phần cốt lõi là bộ mã hóa và bộ giải mã:\vspace{-0.1cm}
+\begin{itemize}[label={--}, itemsep=1pt]
+    \item \textbf{Bộ mã hóa (Encoder):} Sử dụng các tầng mạng nơ-ron đồ thị (trong đề tài này là GATv2) để thực hiện phép biến đổi không gian dữ liệu. Đầu vào gồm ma trận đặc trưng nút $X$ (396 chiều) và cấu trúc đồ thị (ma trận kề $A$). Encoder nén dữ liệu này thành một ma trận nhúng $Z$ ở không gian thấp chiều hơn (16 chiều). Quá trình này giúp mô hình "đúc kết" các thông tin quan trọng nhất về hành vi và mối liên kết của người dùng.
+    \item \textbf{Bộ giải mã (Decoder):} Mục tiêu của Decoder là tái cấu trúc lại đồ thị gốc từ không gian nhúng $Z$. Cụ thể, khả năng liên kết giữa hai nút được dự đoán thông qua tích vô hướng của các vector nhúng tương ứng: $\hat{A} = \sigma(ZZ^T)$, trong đó $\sigma$ là hàm kích hoạt sigmoid.
+\end{itemize}
 
 \begin{figure}[H]
     \centering
-    \includegraphics[width=0.8\linewidth]{images/part-02/chap-01/SBERT.png}
+    \includegraphics[width=1\linewidth]{images/part-02/chap-01/GAE.png}
     \vspace{0.5cm}
-    \caption{Minh hoạ kiến trúc cơ bản của SBERT}
-    \label{fig:SBERT}
+    \caption{Quy trình học không giám sát của mô hình GAE}
+    \label{fig:GAE}
 \end{figure}
 
-Cơ chế hoạt động của SBERT như sau:\vspace{-0.1cm}
-\begin{itemize}[label={--}, itemsep=1pt]
-    \item Siamese Architecture: Hai câu văn bản đầu vào được đưa qua cùng một mạng BERT (chia sẻ trọng số) để tạo ra các vector ngữ cảnh.
-    \item Pooling Strategy: Một lớp Pooling (thường là Mean Pooling) được áp dụng để nén thông tin từ các token thành một vector cố định đại diện cho toàn bộ câu.
-    \item Objective Function: Trong quá trình huấn luyện, mạng tối ưu hóa hàm mất mát (như Cosine Similarity Loss) để kéo các vector của các câu có nghĩa giống nhau lại gần và đẩy các câu khác nghĩa ra xa.
-\end{itemize}
+Việc tối ưu hóa GAE được thực hiện bằng cách giảm thiểu sai số tái cấu trúc (Reconstruction Loss) giữa đồ thị thực tế $A$ và đồ thị dự đoán $\hat{A}$. Thông qua quá trình này, các thực thể có hành vi mạng lưới tương đồng --- như các cụm tài khoản Sybil cùng thực hiện tương tác chéo hoặc cùng chung quyền sở hữu ví --- sẽ được ánh xạ vào các vị trí nằm gần nhau trong không gian nhúng 16 chiều. \vspace{0.3cm}
 
-Trong thực tế triển khai, các mô hình BERT chuẩn (như BERT-base) là rất nặng và chậm. Để cân bằng giữa hiệu suất và tốc độ, Wang và cộng sự đã thiết kế kiến trúc MiniLM \cite{wang2020minilmdeepselfattentiondistillation} dựa trên kỹ thuật chưng cất tri thức (Knowledge Distillation).\vspace{0.3cm}
-
-Mô hình all-MiniLM-L6-v2 là một trong những đại diện phổ biến nhất của dòng này (được triển khai trong thư viện \textit{sentence-transformers}), với các đặc điểm kỹ thuật sau:\vspace{-0.1cm}
-\begin{itemize}[label={--}, itemsep=1pt]
-    \item Kiến trúc: Sử dụng MiniLM làm nền tảng, mô hình này đóng vai trò là "học sinh" (student) học lại tri thức từ các mô hình "giáo viên" (teacher) lớn hơn như BERT hoặc RoBERTa. Đặc biệt, MiniLM chưng cất cả mối quan hệ self-attention thay vì chỉ chưng cất lớp đầu ra, giúp mô hình nhỏ giữ được khả năng hiểu ngữ cảnh sâu.
-    \item Cấu hình: Ký hiệu "L6" biểu thị mô hình chỉ có 6 lớp Transformer (so với 12 lớp của BERT-base), giúp giảm kích thước mô hình xuống khoảng 80MB và tăng tốc độ suy luận lên hơn 5 lần.
-    \item Biểu diễn: Đầu ra là một vector có kích thước 384 chiều. Mặc dù số chiều nhỏ hơn so với chuẩn 768 của BERT, all-MiniLM-L6-v2 vẫn duy trì độ chính xác cao trên các bảng xếp hạng đánh giá embedding (như MTEB), đặc biệt hiệu quả cho các tác vụ tìm kiếm ngữ nghĩa và gom nhóm văn bản.
-\end{itemize}
+Kết quả của giai đoạn này là các vector nhúng giàu thông tin ngữ cảnh và cấu trúc. Đây chính là tiền đề quan trọng để thuật toán K-Means thực hiện phân cụm rủi ro ở bước tiếp theo, biến bài toán thiếu nhãn ban đầu thành bài toán gán nhãn giả lập (Pseudo-labeling) có tính chính xác cao, tạo điều kiện cho các giai đoạn học có giám sát về sau.
