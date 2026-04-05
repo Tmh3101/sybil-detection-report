@@ -1,23 +1,116 @@
-\subsubsection{2.3. Đồ thị đa quan hệ nhận thức ràng buộc (Constraint-Aware Graph)}
-\indent\indent Trong các hệ thống mạng xã hội Web3, dữ liệu không chỉ dừng lại ở các thuộc tính đơn lẻ của người dùng mà còn nằm ở mạng lưới các mối quan hệ dày đặc giữa các thực thể. Để phát hiện hiệu quả các hành vi dị thường, nghiên cứu chuyển đổi dữ liệu phẳng thành cấu trúc đồ thị đa quan hệ (Multi-relational Graph) nhận thức ràng buộc. Theo Akoglu và cộng sự \cite{akoglu2015graph}, việc khai thác đồng thời các ràng buộc về mặt cấu trúc và quan hệ là yếu tố then chốt để bóc tách các mẫu hành vi có tính tổ chức của các thực thể độc hại trong môi trường mạng phức tạp.\vspace{0.3cm}
+\subsubsection{2.3. Mạng nơ-ron đồ thị (GNN)}
+\indent\indent Mạng nơ-ron đồ thị là một lớp mô hình học sâu chuyên biệt được thiết kế để khai thác dữ liệu trong không gian phi Euclid. Theo đánh giá tổng quan của Zhang và cộng sự \cite{zhang2019graph}, mục tiêu của GNN là học các vector biểu diễn nút (\textit{node embeddings}) cấp thấp sao cho bảo tồn được cả đặc trưng nội tại của nút và cấu trúc liên kết phức tạp của mạng lưới. Trong bài toán này, GNN đóng vai trò là "bộ não" trích xuất các mẫu hành vi của các cụm Sybil từ đồ thị đa tầng.\vspace{0.3cm}
 
-Hệ thống \textbf{SybilSignal} mô hình hóa dữ liệu thành đồ thị với 4 tầng quan hệ phân biệt. Mỗi tầng được thiết lập một trọng số cơ sở ($W_{base}$) khác nhau, phản ánh chi phí hành vi và mức độ tin cậy của mối quan hệ:\vspace{-0.1cm}
-\begin{itemize}[label={--}, itemsep=1pt]
-    \item \textbf{Tầng theo dõi ($W_{base} = 1$):} Biểu diễn quan hệ mạng xã hội cơ bản. Đây là tầng có độ nhiễu cao nhất vì các tài khoản ảo có thể dễ dàng thiết lập kết nối này với chi phí thấp nhằm thao túng thuật toán đề xuất.
-    \item \textbf{Tầng tương tác ($W_{base} = 2$):} Gộp chung các hành vi tạo ra giá trị nội dung hoặc yêu cầu chi phí (Upvote, Comment, Collect, Quote, Tip và các chiều ngược lại). Việc gộp nhóm này giúp mô hình GNN tập trung vào "cường độ tương tác" thay vì bị phân mảnh bởi quá nhiều loại cạnh khác nhau.
-    \item \textbf{Tầng Tương đồng ($W_{base} = 5$):} Nhằm mục tiêu xác định dấu vết của các Sybil vốn thường có hành vi rập khuôn trong việc thiết lập hồ sơ. Để đảm bảo độ chính xác và giảm thiểu các liên kết nhiễu, nghiên cứu áp dụng nguyên tắc \textbf{ràng buộc 2/3}. Theo đó, một cạnh tương đồng chỉ được thiết lập giữa hai tài khoản nếu chúng vi phạm đồng thời ít nhất 2 trong 3 tiêu chí sau:\vspace{-0.1cm}
-    \begin{itemize}[label={+}, itemsep=0pt]
-        \item \textit{Tương đồng tiểu sử:} Đạt ngưỡng cao về độ tương đồng Cosine giữa các vector nhúng của tiểu sử.
-        \item \textit{Tương đồng tên định danh:} Tên định danh có khoảng cách chuỗi (Edit Distance) nằm trong phạm vi biến đổi nhỏ, cho thấy dấu hiệu của việc sinh tên tự động.
-        \item \textit{Tương đồng thời gian tạo tài khoản:} Các tài khoản được khởi tạo trong cùng một cụm thời gian ngắn, phản ánh hành vi tạo tài khoản hàng loạt bằng công cụ.
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.8\linewidth]{images/part-02/chap-01/GNN.png}
+    \vspace{0.5cm}
+    \caption{Minh hoạ kiến trúc cơ bản của GNN}
+    \label{fig:GNN}
+\end{figure}
+
+Cơ chế hoạt động cốt lõi của GNN là truyền thông điệp (\textit{Message Passing}). Tại mỗi tầng $l$, đặc trưng của nút $v$ được cập nhật thông qua việc tổng hợp thông tin từ tập hàng xóm $N(v)$:\vspace{-0.1cm}
+\[
+    h_v^{(l)} = \text{UPDATE}^{(l)} \left( h_v^{(l-1)}, \text{AGGREGATE}^{(l)} \left( \{ h_u^{(l-1)} | u \in N(v) \} \right) \right)
+\]
+Trong đó $h_v^{(l)}$ là trạng thái ẩn của nút tại tầng $l$.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.8\linewidth]{images/part-02/chap-01/GNN_MessagePassing.png}
+    \vspace{0.5cm}
+    \caption{Cơ chế truyền tin cơ bản trong mạng GNN}
+    \label{fig:GNN_MP}
+\end{figure}
+
+\textbf{2.3.1. Các kiến trúc mạng nơ-ron đồ thị thực nghiệm}\vspace{0.2cm}
+
+Với đặc thù phức tạp của mạng lưới SocialFi, đề tài không giới hạn ở một kiến trúc duy nhất mà thiết lập một hệ thống thử nghiệm toàn diện. Năm kiến trúc GNN tiên tiến được triển khai và đánh giá để tìm ra mô hình nhận diện tài khoản giả mạo tối ưu nhất:
+
+\begin{itemize}[label={--}, itemsep=5pt]
+    \item \textbf{Graph Attention Networks (GATv2):} Đóng vai trò là kiến trúc chủ đạo của hệ thống. GAT nguyên bản \cite{velickovic2017graph} tạo đột phá bằng cơ chế tự chú ý, nhưng bộc lộ giới hạn về "chú ý tĩnh", khiến mức độ quan trọng của láng giềng bị đánh giá toàn cục. Khắc phục rào cản này, Brody và cộng sự \cite{brody2021attentive} đã đề xuất GATv2 với cơ chế "chú ý động". Nhờ cơ chế chú ý động của GATv2, mô hình trở nên linh hoạt hơn trong việc phân bổ trọng số, từ đó bước đầu học được cách dồn sự chú ý vào các liên kết mang tín hiệu quyết định. Bản chất toán học của kiến trúc GATv2 nguyên bản được thể hiện qua các bước sau:
+    \begin{itemize}[label={+}, itemsep=2pt]
+        \item \textbf{Hệ số chú ý chưa chuẩn hóa} $e_{ij}$ được tính bằng cách ghép nối vector đặc trưng của hai nút, biến đổi tuyến tính và áp dụng hàm phi tuyến trước khi nhân với vector chú ý:
+        \[
+            e_{ij} = \vec{a}^T \text{LeakyReLU}\left( \mathbf{W} [h_i \| h_j] \right)
+        \]
+        Trong đó: $h_i, h_j$ là vector đặc trưng ẩn của nút gốc $i$ và láng giềng $j$; $\mathbf{W}$ là ma trận trọng số học được; $\vec{a}$ là vector chú ý.
+        
+        \item \textbf{Trọng số chú ý} $\alpha_{ij}$ được chuẩn hóa bằng hàm softmax để có thể so sánh giữa các láng giềng:
+        \[
+            \alpha_{ij} = \frac{\exp(e_{ij})}{\sum_{k \in N_i} \exp(e_{ik})}
+        \]
+        
+        \item \textbf{Vector đầu ra} được tổng hợp bằng cách tính tổng có trọng số và đưa qua hàm phi tuyến, trong nghiên cứu này là hàm ELU:
+        \[
+            \vec{h}'_i = \text{ELU} \left( \sum_{j \in N_i} \alpha_{ij} \mathbf{W}\vec{h}_j \right)
+        \]
+        
+        \item Mô hình tích hợp \textbf{\textit{Multi-head Attention}} tương tự Transformer \cite{vaswani2017attention} để ổn định quá trình học, ghép nối ở tầng ẩn và lấy trung bình ở tầng đầu ra.
     \end{itemize}
-    \item \textbf{Tầng Đồng sở hữu ($W_{base} = 10$):} Ràng buộc mạnh mẽ nhất về mặt kỹ thuật và tài chính, biểu diễn quan hệ các tài khoản được quản lý bởi cùng một địa chỉ ví Web3. Đây là bằng chứng thép để xác định các nhóm Sybil do một thực thể duy nhất điều khiển.
+    \begin{figure}[H]
+        \centering
+        \includegraphics[width=0.8\linewidth]{images/part-02/chap-01/GAT.png}
+        \vspace{0.5cm}
+        \caption{Minh hoạ kiến trúc cơ bản của GAT}
+        \label{fig:GAT}
+    \end{figure}
+
+    \item \textbf{Graph Convolutional Networks (GCN):} Dựa trên công trình nền tảng của Kipf và Welling \cite{kipf2016variational}, GCN sử dụng phép xấp xỉ bậc nhất của tích chập phổ đồ thị để lan truyền và tổng hợp thông tin. Trong khung thử nghiệm của đề tài, mô hình này được triển khai để đóng vai trò là thước đo đối chứng cơ sở. Khác biệt cốt lõi với cơ chế chú ý động của GAT là GCN sử dụng cơ chế tổng hợp mang đặc trưng của một bộ lọc tĩnh. Tính chất này được thể hiện qua công thức lan truyền đa tầng ở dạng ma trận:
+    \[
+        H^{(l+1)} = \sigma\left( \tilde{D}^{-1/2} \tilde{A} \tilde{D}^{-1/2} H^{(l)} \mathbf{W}^{(l)} \right)
+    \]
+    Trong đó, $H^{(l)}$ là ma trận đặc trưng của các nút tại tầng $l$; $\mathbf{W}^{(l)}$ là ma trận trọng số học được; $\tilde{A}$ là ma trận kề đã thêm vòng lặp tự thân (\textit{self-loops}) và $\tilde{D}$ là ma trận bậc đường chéo tương ứng.\vspace{0.3cm}
+
+    Bản chất "tĩnh" và sự hạn chế của GCN nguyên bản được bộc lộ rõ nhất khi xét quá trình lan truyền thông điệp từ láng giềng $j$ đến nút $i$ ở cấp độ từng nút:
+    \[
+        h_i^{(l+1)} = \sigma \left( \sum_{j \in \mathcal{N}(i) \cup \{i\}} \frac{1}{\sqrt{\tilde{d}_i \tilde{d}_j}} \mathbf{W}^{(l)} h_j^{(l)} \right)
+    \]
+    % Vì kiến trúc gốc được thiết kế cho đồ thị không trọng số, tử số của hệ số lan truyền mặc định luôn là $1$, và $\tilde{d}_i$ chỉ đơn thuần là giá trị đếm số lượng láng giềng. Điều này đồng nghĩa với việc sự đóng góp của các nút láng giềng được phân bổ cố định, khiến GCN đối xử cào bằng với mọi kết nối và cực kỳ dễ bị đánh lừa bởi các liên kết rác (\textit{noise edges}) trong mạng SocialFi.\vspace{0.3cm}
+
+    % Mặc dù mang nhược điểm cố hữu trong việc tự đánh giá tầm quan trọng của láng giềng, đề tài không sử dụng GCN một cách rập khuôn. Thay vào đó, mô hình được tùy biến và ép kiểu để tiếp nhận đặc trưng cạnh 1 chiều (\texttt{edge\_weight}) từ hệ thống tiền xử lý. Cơ chế can thiệp trực tiếp vào lõi toán học của GCN (sẽ được trình bày chi tiết tại Mục 2.3.2) giúp mô hình khắc phục rào cản đồ thị không trọng số, từ đó thiết lập một thước đo hiệu năng tối thiểu (\textit{lower-bound performance}) vững chắc và khách quan cho bài toán bóc tách mạng lưới Sybil.
+    
+    \item \textbf{Graph Isomorphism Network with Edge features (GINE):} Đóng vai trò là kiến trúc đại diện cho trường phái phân tích cấu trúc tô-pô chuyên sâu. Nguyên bản của kiến trúc này là mạng GIN (\textit{Graph Isomorphism Network}) được đề xuất bởi Xu và cộng sự \cite{xu2018powerful}. Điểm cốt lõi giúp nó vượt trội hơn GCN nằm ở cơ chế tổng hợp láng giềng mang tính đơn ánh trên các đa tập hợp. Thay vì sử dụng phép lấy trung bình, kiến trúc này sử dụng phép tổng kết hợp với mạng nơ-ron đa tầng (MLP). Tuy nhiên, GIN nguyên bản bộc lộ giới hạn lớn khi không có khả năng xử lý các đặc trưng cạnh. Từ đó biến thể GINE (\textit{GIN with Edges features}) được giới thiệu thông qua nghiên cứu của Hu và cộng sự \cite{hu2019strategies}. Công thức truyền tin được tùy biến để nhúng trực tiếp trọng số cạnh $e_{uv}$ vào thông điệp của láng giềng trước khi thực hiện phép gộp:
+    \[
+        h_v^{(k)} = \text{MLP}^{(k)} \left( (1 + \epsilon^{(k)}) h_v^{(k-1)} + \sum_{u \in \mathcal{N}(v)} \text{ReLU} \left( h_u^{(k-1)} + e_{uv} \right) \right)
+    \]
+    Trong đó, $e_{uv}$ chính là trọng số vô hướng $w_{ij}$ đại diện cho chi phí hành vi. Việc thực hiện thực nghiệm trên GINE không chỉ cho phép nhận diện được các cấu trúc hình học dị thường của các cụm Sybil (như mạng lưới hình sao), mà còn phân biệt được bản chất của các liên kết đó.\vspace{0.3cm}
+
+    \item \textbf{Principal Neighbourhood Aggregation (PNA):} Trong mạng Web3, sự chênh lệch bậc (\textit{Degree-variance}) giữa các KOL và người dùng thông thường là cực lớn. PNA giải quyết triệt để sự mất cân bằng này bằng cách kết hợp 4 bộ tổng hợp (Mean, Min, Max, Std) và 3 bộ chia tỷ lệ (\textit{Scalers}), giúp tín hiệu của đồ thị không bị áp đảo bởi các "siêu nút".
+    
+    \item \textbf{Graph Transformer Networks (\texttt{TransformerConv}):} Kế thừa cơ chế chú ý tích vô hướng (\textit{Dot-product Attention}) dựa trên ma trận Query-Key-Value ($Q, K, V$) từ bài báo UniMP \cite{shi2020masked}. Kiến trúc này đo lường sự tương đồng sâu sắc giữa các láng giềng, đặc biệt phát huy hiệu quả khi kết hợp với vector nhúng văn bản biểu diễn tiểu sử tài khoản.
 \end{itemize}
 
-Một thách thức đặc thù trong phân tích đồ thị mạng xã hội là sự tồn tại của các nút siêu đặc — những tài khoản sở hữu hàng chục nghìn kết nối — và các cụm siêu đặc — nơi các tài khoản hình thành mạng lưới liên kết chằng chịt, tương tác chéo với cường độ cao. Nếu chỉ sử dụng trọng số tuyến tính, khối lượng tín hiệu khổng lồ phát ra từ các cấu trúc này sẽ lấn át hoàn toàn luồng truyền tin (message passing) của toàn mạng lưới. Hậu quả là mạng GNN sẽ nhanh chóng rtrở nên quá mịn, khiến vector đặc trưng của các nút trở nên giống hệt nhau và mất đi khả năng phân loại. Để giải quyết triệt để vấn đề này, đề tài áp dụng cơ chế chuẩn hóa trọng số logarit:
+\vspace{0.3cm}
+\textbf{2.3.2. Tối ưu hóa tham số cho đồ thị đa quan hệ}\vspace{0.2cm}
 
-\begin{equation}
-    W_{final} = W_{base} \times \log(1 + \text{count})
-\end{equation}
+Với kiến trúc đồ thị đa quan hệ có trọng số, các thực thể tương tác thông qua 18 loại quan hệ khác nhau. Nếu biểu diễn các cạnh này theo phương pháp mã hóa One-hot 18 chiều và đưa trực tiếp vào mạng GNN, hệ thống sẽ gặp phải tình trạng bùng nổ tham số. Hiện tượng quá khớp trên tập dữ liệu thưa thớt. Để giải quyết triệt để rào cản này, đề tài thực hiện chuỗi tối ưu hóa tham số từ mức độ dữ liệu đến lõi kiến trúc:
 
-Trong đó \textit{count} là tần suất hành vi hoặc cường độ tương tác giữa hai nút. Phương pháp này có sự tương đồng mật thiết với cơ chế \textit{logarithmic scalers} trong kiến trúc mạng PNA \cite{corso2020principal}, giúp nén các giá trị cực đại và đảm bảo sự cân bằng trong quá trình học đặc trưng. Sự kết hợp giữa đồ thị đa tầng và cơ chế trọng số nhận thức ràng buộc cung cấp một tín hiệu giàu thông tin, giúp mô hình bóc trần cấu trúc bầy đàn tinh vi của các mạng lưới Sybil.
+\begin{itemize}[label={--}, itemsep=5pt]
+        \item \textbf{Tối ưu kiến trúc GATv2 (Edge-augmented GATv2):} Để kiến trúc này tận dụng tối đa tham số $w_{ij}$ vừa được nén, đề tài áp dụng cơ chế \textit{dung hợp sớm trọng số cạnh}. Trọng số cạnh $w_{ij}$ được can thiệp trực tiếp vào quá trình tính toán hệ số chú ý thông qua phép cộng tuyến tính trước hàm kích hoạt phi tuyến:
+        \[
+            e_{ij} = \vec{a}^T \text{LeakyReLU}\left( \mathbf{W}_n [h_i \| h_j] + \mathbf{W}_e w_{ij} \right)
+        \]
+        Trong đó, $\mathbf{W}_e$ là vector tham số học được đóng vai trò phóng chiếu trọng số vô hướng $w_{ij}$ vào cùng không gian ẩn với đặc trưng nút. Việc tối ưu hóa bằng cách đặt tham số cạnh vào bên trong hàm LeakyReLU ép mạng nơ-ron phải dẫn dắt sự chú ý dựa trên tương tác chéo giữa bản chất thực thể và chi phí hành vi ($w_{ij}$).
+
+        \item \textbf{Tinh chỉnh các kiến trúc cơ sở:} Việc đồng bộ hóa không gian tham số đầu vào (\texttt{edge\_dim = 1}) không chỉ dừng lại ở bước tiền xử lý mà còn can thiệp trực tiếp vào lõi toán học của toàn bộ các mô hình đối chứng. Mỗi kiến trúc buộc phải thay đổi cơ chế tổng hợp nguyên thủy để thích ứng với trọng số $w_{ij}$, nhằm phản ánh đúng bản chất dữ liệu của mạng SocialFi:
+        \begin{itemize}[label={+}, itemsep=4pt]
+            \item \textbf{Graph Convolutional Networks (GCN):} Thay vì sử dụng cơ chế cào bằng láng giềng $\frac{1}{\sqrt{\tilde{d}_i \tilde{d}_j}}$ như nguyên bản \cite{kipf2016variational}, hệ thống tinh chỉnh công thức cập nhật thành:
+            \[
+                c_{ij} = \frac{w_{ij}}{\sqrt{\tilde{d}_i \tilde{d}_j}}
+            \]
+            Trong đó $w_{ij}$ là trọng số cạnh thực tế và $\tilde{d}_i$ là tổng trọng số các liên kết kề. Sự can thiệp này ép GCN phải phân bổ thông tin dựa trên độ tin cậy của giao dịch thay vì chỉ dựa trên cấu trúc mạng lưới thô.
+
+            \item \textbf{Graph Isomorphism Network with Edge features (GINE):} Khác với nguyên bản trong nghiên cứu của Hu và cộng sự \cite{hu2019strategies} vốn mặc định đặc trưng nút và cạnh có cùng kích thước. Do trọng số hành vi $w_{ij}$ chỉ có một chiều, hệ thống tích hợp thêm ma trận phóng chiếu $\mathbf{W}_e$ vào lõi toán học:
+            \[
+                \sum_{j \in \mathcal{N}(i)} \text{ReLU} (h_j + \mathbf{W}_e w_{ij})
+            \]
+            Sự thay đổi này cho phép GINE thực hiện phép tổng hợp giữa vector nhúng nút đa chiều và trọng số vô hướng của cạnh. Tinh chỉnh này ép mô hình thực hiện bài kiểm tra đẳng cấu đồ thị dựa trên sự kết hợp giữa hình học tô-pô và định lượng hành vi đã được nén qua ma trận $\mathbf{W}_e$.
+            
+            \item \textbf{Principal Neighbourhood Aggregation (PNA):} Với sự xuất hiện của $w_{ij}$, thông điệp truyền từ nút láng giềng bị biến đổi bởi độ lớn của cạnh trước khi đi vào các bộ tổng hợp thống kê (Mean, Min, Max, Std). Điều này giúp các bộ chia tỷ lệ (\textit{Scalers}) của PNA hoạt động chính xác hơn, không bị nhiễu loạn bởi các bot farm có bậc kết nối (degree) lớn nhưng chất lượng cạnh ($w_{ij}$) thấp.
+            
+            \item \textbf{Graph Transformer Networks:} Trong cơ chế chú ý tích vô hướng (\textit{Dot-product Attention}) của Transformer, không gian tham số 1 chiều của cạnh được phóng chiếu và cộng trực tiếp vào ma trận Khóa (\textit{Key}) và ma trận Giá trị (\textit{Value}). Cải tiến này cho phép hệ số tương đồng giữa hai tài khoản không chỉ phụ thuộc vào vector hồ sơ (Bio) mà còn bị chi phối mạnh mẽ bởi bản chất của loại giao dịch kết nối chúng.
+        \end{itemize}
+\end{itemize}
+
+Thông qua chuỗi tối ưu hóa này, đề tài không chỉ giải quyết được bài toán về giới hạn phần cứng mà còn thiết lập một quy trình truyền tin thống nhất. Các mô hình GNN được định hướng bởi các "ràng buộc chuyên gia" đã được mã hóa sẵn, giúp tăng tốc độ hội tụ và nâng cao hiệu suất phân biệt cụm Sybil trên mạng SocialFi.

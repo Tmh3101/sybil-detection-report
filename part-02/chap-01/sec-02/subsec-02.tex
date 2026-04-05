@@ -1,20 +1,34 @@
-\subsubsection{2.2. Bộ mã hóa tự động đồ thị (Graph Autoencoder – GAE)}
-\indent\indent Trong môi trường mạng xã hội phi tập trung, thách thức lớn nhất đối với việc huấn luyện các mô hình học sâu là sự thiếu hụt nghiêm trọng dữ liệu nhãn về các tài khoản giả mạo. Để giải quyết vấn đề này, nghiên cứu áp dụng cơ chế học biểu diễn không giám sát (Unsupervised Representation Learning) thông qua bộ mã hóa tự động đồ thị (Graph Autoencoder – GAE), như được minh họa cụ thể trong Hình \ref{fig:GAE}. Phương pháp này, được đề xuất bởi Kipf và Welling \cite{kipf2016variational}, cho phép mô hình tự tìm ra các đặc điểm cấu trúc tiềm ẩn và quy luật phân phối của các nhóm tài khoản dựa trên dữ liệu thô mà không cần sự can thiệp của nhãn thủ công.\vspace{0.3cm}
-
-Về mặt toán học, GAE hoạt động dựa trên hai thành phần cốt lõi là bộ mã hóa và bộ giải mã:\vspace{-0.1cm}
-\begin{itemize}[label={--}, itemsep=1pt]
-    \item \textbf{Bộ mã hóa (Encoder):} Sử dụng các tầng mạng nơ-ron đồ thị (trong đề tài này là GATv2) để thực hiện phép biến đổi không gian dữ liệu. Đầu vào gồm ma trận đặc trưng nút $X$ (396 chiều) và cấu trúc đồ thị (ma trận kề $A$). Encoder nén dữ liệu này thành một ma trận nhúng $Z$ ở không gian thấp chiều hơn (16 chiều). Quá trình này giúp mô hình "đúc kết" các thông tin quan trọng nhất về hành vi và mối liên kết của người dùng.
-    \item \textbf{Bộ giải mã (Decoder):} Mục tiêu của Decoder là tái cấu trúc lại đồ thị gốc từ không gian nhúng $Z$. Cụ thể, khả năng liên kết giữa hai nút được dự đoán thông qua tích vô hướng của các vector nhúng tương ứng: $\hat{A} = \sigma(ZZ^T)$, trong đó $\sigma$ là hàm kích hoạt sigmoid.
-\end{itemize}
+\subsubsection{2.2. Đồ thị đa quan hệ nhận thức ràng buộc (Constraint-Aware Graph)}
+\indent\indent Trong các hệ thống mạng xã hội Web3, dữ liệu không chỉ mang tính phi cấu trúc mà còn biến đổi liên tục theo thời gian. Để phát hiện hiệu quả các hành vi dị thường, nghiên cứu chuyển đổi dữ liệu phẳng thành cấu trúc Đồ thị đa quan hệ (\textit{Multi-relational Graph}) nhận thức ràng buộc. Theo Akoglu và cộng sự \cite{akoglu2015graph}, việc khai thác đồng thời các ràng buộc về mặt cấu trúc và quan hệ là yếu tố then chốt để bóc tách các mẫu hành vi có tính tổ chức của các thực thể độc hại.
 
 \begin{figure}[H]
     \centering
-    \includegraphics[width=1\linewidth]{images/part-02/chap-01/GAE.png}
+    \includegraphics[width=0.8\linewidth]{images/part-02/chap-01/MG_ver2.jpg}
     \vspace{0.5cm}
-    \caption{Quy trình học không giám sát của mô hình GAE}
-    \label{fig:GAE}
+    \caption{Kiến trúc đồ thị đa đa quan hệ (tạm)}
+    \label{fig:MRG}
 \end{figure}
 
-Việc tối ưu hóa GAE được thực hiện bằng cách giảm thiểu sai số tái cấu trúc (Reconstruction Loss) giữa đồ thị thực tế $A$ và đồ thị dự đoán $\hat{A}$. Thông qua quá trình này, các thực thể có hành vi mạng lưới tương đồng --- như các cụm tài khoản Sybil cùng thực hiện tương tác chéo hoặc cùng chung quyền sở hữu ví --- sẽ được ánh xạ vào các vị trí nằm gần nhau trong không gian nhúng 16 chiều. \vspace{0.3cm}
+Hệ thống \textbf{SybilSignal} thiết lập 4 tầng quan hệ chính được phân rã thành 18 loại cạnh khác nhau nhằm bảo tồn tối đa thông tin hành vi:\vspace{-0.1cm}
 
-Kết quả của giai đoạn này là các vector nhúng giàu thông tin ngữ cảnh và cấu trúc. Đây chính là tiền đề quan trọng để thuật toán K-Means thực hiện phân cụm rủi ro ở bước tiếp theo, biến bài toán thiếu nhãn ban đầu thành bài toán gán nhãn giả lập (Pseudo-labeling) có tính chính xác cao, tạo điều kiện cho các giai đoạn học có giám sát về sau.
+\begin{itemize}[label={--}, itemsep=1pt]
+    \item \textbf{Tầng Theo dõi (FOLLOW - $W_{base} = 1$):} Biểu diễn quan hệ mạng xã hội có hướng cơ bản, gồm 2 loại cạnh \texttt{FOLLOW} và \texttt{FOLLOW\_REV}. Đây là tầng có độ nhiễu cao nhất vì các tài khoản ảo dễ dàng thao túng với chi phí thấp.
+    
+    \item \textbf{Tầng Tương tác (INTERACT - $W_{base} = 2$):} Tầng này có cấu trúc phức tạp nhất với 14 loại cạnh (7 hành vi x 2 chiều), bao gồm: \texttt{UPVOTE}, \texttt{REACTION}, \texttt{COMMENT}, \texttt{QUOTE}, \texttt{MIRROR}, \texttt{COLLECT}, \texttt{TIP} và các cạnh đảo tương ứng (với hậu tố \texttt{\_REV}).
+
+    \item \textbf{Tầng Tương đồng (SIMILARITY - $W_{base} = 5$):} Là quan hệ vô hướng đối xứng, kết nối các tài khoản có hành vi rập khuôn dựa trên nguyên tắc \textbf{ràng buộc 2/3}. Cạnh tương đồng chỉ được thiết lập nếu hai nút vi phạm đồng thời ít nhất 2 trong 3 tiêu chí sau:
+    \begin{itemize}[label={+}, itemsep=0pt]
+        \item \textit{Tương đồng tiểu sử:} Đạt ngưỡng cao về độ tương đồng giữa các vector nhúng của tiểu sử.
+        \item \textit{Tương đồng tên định danh:} Tên định danh có khoảng cách chuỗi chuẩn hóa (\textit{Normalized Levenshtein Distance}) \cite{yujian2007normalized} nằm trong phạm vi biến đổi nhỏ, cho thấy dấu hiệu của việc sinh tên tự động.
+        \item \textit{Tương đồng thời gian tạo tài khoản:} Các tài khoản được khởi tạo trong cùng một cụm thời gian ngắn, phản ánh hành vi tạo tài khoản hàng loạt bằng công cụ.
+    \end{itemize}
+    
+    \item \textbf{Tầng Đồng sở hữu (CO-OWNER - $W_{base} = 10$):} Ràng buộc mạnh mẽ nhất về mặt kỹ thuật, biểu diễn quan hệ vô hướng giữa các tài khoản được quản lý bởi cùng một địa chỉ ví. Đây là dấu hiệu rõ nét để nhận diện các cụm Sybil do một thực thể duy nhất điều khiển.
+\end{itemize}
+
+Để giải quyết thách thức từ các nút siêu đặc và các cụm siêu đặc có thể gây quá mịn, đề tài áp dụng phương pháp \textbf{chuẩn hóa đặc trưng cạnh} với phạm vi ở cấp độ loại cạnh. Thay vì sử dụng trọng số tuyến tính, hệ thống áp dụng hàm phi tuyến để giới hạn biên độ dữ liệu:
+\[
+    W_{final} = W_{base} \times \log_{10}(1 + \text{count})
+\]
+
+Trong đó \textit{count} là tần suất hành vi cụ thể giữa hai nút. Phương pháp này có sự tương đồng với cơ chế \textit{logarithmic scalers} trong kiến trúc mạng PNA \cite{corso2020principal}, đảm bảo sự cân bằng về mặt thống kê và tăng cường khả năng trích xuất đặc trưng của mạng GNN đối với các cấu trúc dày đặc trên chuỗi khối.
