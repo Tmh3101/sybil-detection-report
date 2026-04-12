@@ -1,6 +1,6 @@
 \subsection{1. Mô tả chi tiết bài toán}
 \subsubsection{1.1. Bài toán phát hiện Sybil trên Web3}
-\indent\indent Nghiên cứu tập trung giải quyết bài toán phát hiện tài khoản giả mạo (Sybil) trên mạng xã hội phi tập trung (Lens Protocol) bằng cách phân loại các thực thể người dùng vào các nhóm rủi ro đã được định nghĩa. Khác với các phương pháp phát hiện Sybil truyền thống trên Web2 (như Facebook hay Twitter) thường chỉ dựa vào hành vi đơn lẻ hoặc văn bản tĩnh, bài toán này đòi hỏi mô hình phải có khả năng xử lý và tổng hợp tri thức từ các cấu trúc đồ thị đa quan hệ, đồng thời nắm bắt được tính sở hữu đặc thù để phân tích đúng bản chất của các cụm Sybil.\vspace{0.3cm}
+\indent\indent Nghiên cứu tập trung giải quyết bài toán phát hiện tài khoản Sybil trên mạng xã hội phi tập trung Lens Protocol bằng cách phân loại các thực thể người dùng vào các nhóm rủi ro cụ thể. Khác với các phương pháp truyền thống trên Web2 vốn thường chỉ dựa vào hành vi đơn lẻ hoặc văn bản tĩnh \cite{al2017sybil}, bài toán này đòi hỏi mô hình phải có khả năng xử lý các hành vi tinh vi — nơi các Sybil được AI tạo sinh để ngụy trang hồ sơ giống hệt người dùng thật nhằm thiết lập các mối quan hệ tin cậy \cite{heeb2024sybil}. Đặc biệt trong bối cảnh Blockchain, bài toán còn yêu cầu khả năng tổng hợp tri thức từ các cấu trúc đồ thị đa quan hệ để bóc tách các cụm Sybil có hành vi đồng nhất chuyên phục vụ mục đích thao túng \cite{liu2025detecting}.\vspace{0.3cm}
 
 Hệ thống phân lớp được xây dựng dựa trên ma trận đặc trưng nút có tổng cộng 396 chiều, kết hợp cùng đồ thị cấu trúc, cụ thể như sau:
 \vspace{-0.1cm}
@@ -9,15 +9,15 @@ Hệ thống phân lớp được xây dựng dựa trên ma trận đặc trưn
     
     \item \textbf{Đặc trưng thống kê và hành vi:} Bổ sung 12 chiều dữ liệu định lượng và trạng thái của tài khoản, bao gồm:
     \begin{itemize}[label={+}, itemsep=1pt]
-        \item \textit{Chỉ số cường độ hoạt động:} 10 đặc trưng thống kê tổng quan (như tổng lượt theo dõi, đang theo dõi, bài đăng, bình luận, v.v.). Toàn bộ các chỉ số định lượng này đều được chuẩn hóa về khoảng $[0, 1]$ bằng \texttt{MinMaxScaler} để tránh mất cân bằng thang đo trong quá trình huấn luyện mạng nơ-ron.
+        \item \textit{Chỉ số cường độ hoạt động:} 10 đặc trưng thống kê tổng quan (như tổng lượt theo dõi, đang theo dõi, bài đăng, bình luận, v.v.). Toàn bộ các chỉ số định lượng này đều được chuẩn hóa về khoảng $[0, 1]$ bằng \texttt{MinMaxScaler} để tránh mất cân bằng thang đo.
         \item \textit{Trạng thái đại diện:} 1 đặc trưng nhị phân xác định tài khoản có sử dụng hình ảnh đại diện tùy chỉnh hay chỉ dùng ảnh mặc định.
-        \item \textit{Độ tuổi tài khoản:} 1 đặc trưng tính toán số ngày hoạt động kể từ thời điểm khởi tạo.
+        \item \textit{Độ tuổi tài khoản:} 1 đặc trưng tính toán số ngày hoạt động kể từ thời điểm khởi tạo, hỗ trợ phát hiện sự đồng nhất về thời gian đăng ký của các đợt tấn công tự động.
     \end{itemize}
     
-    \item \textbf{Đặc trưng cấu trúc mạng lưới:} Đây là luồng thông tin đóng vai trò then chốt, biểu diễn mối liên kết giữa các tài khoản dưới dạng đồ thị đa quan hệ có trọng số. Cấu trúc này không chỉ bao gồm các hành vi tương tác trên mạng xã hội (theo dõi và tương tác), khai thác tính sở hữu trong mạng xã hội Web3, và tầng tương đồng nhằm liên kết các tài khoản có sự rập khuôn về tiểu sử, tên định danh hoặc thời gian khởi tạo sát nhau. Sự kết hợp đa chiều này giúp mô hình bóc trần toàn diện cấu trúc và các thuật toán sinh tài khoản tự động của các mạng lưới Sybil.
+    \item \textbf{Đặc trưng cấu trúc mạng lưới:} Đây là luồng thông tin đóng vai trò then chốt, biểu diễn mối liên kết giữa các tài khoản dưới dạng đồ thị đa quan hệ có trọng số. Cấu trúc này không chỉ bao gồm các hành vi tương tác trên mạng xã hội (theo dõi và tương tác), mà còn khai thác tính sở hữu trong mạng xã hội Web3 để nhận diện các cụm ví bị điều khiển bởi cùng một thực thể \cite{liu2025detecting}. Bằng việc tích hợp thêm tầng tương đồng (similarity layer) để liên kết các tài khoản có sự rập khuôn về tiểu sử hoặc thời gian khởi tạo, mô hình có khả năng bóc trần toàn diện các "cạnh tấn công" ẩn nấp phía sau các tương tác trông có vẻ hợp lệ \cite{heeb2024sybil}.
 \end{itemize}
 
-Mục tiêu cốt lõi của bài toán là vượt qua giới hạn của việc thiếu nhãn dữ liệu thông qua việc học không giám sát (GAE kết hợp K-Means) và sau đó xây dựng một kiến trúc hợp nhất dựa trên Mạng nơ-ron đồ thị (GNN) kết hợp Máy học truyền thống (Decoupled ML). Kiến trúc này đóng vai trò nhúng các đặc trưng và cấu trúc mạng lưới vào một không gian chung, nhằm tối ưu hóa độ chính xác phân lớp và cung cấp khả năng giải thích.
+Mục tiêu cốt lõi của bài toán là vượt qua giới hạn của việc thiếu nhãn dữ liệu thông qua quy trình học không giám sát (GAE kết hợp K-Means) và xây dựng kiến trúc hợp nhất dựa trên Mạng nơ-ron đồ thị (GNN) kết hợp Máy học truyền thống (Decoupled ML). Kiến trúc này đóng vai trò nhúng các đặc trưng đa chiều và cấu trúc mạng lưới vào một không gian chung, nhằm tối ưu hóa độ chính xác phân lớp rủi ro và cung cấp khả năng giải thích cho các quyết định ngăn chặn Sybil.
 
 %=======================================================================
 \subsubsection{1.2. Ứng dụng Web (SybilSignal Dashboard)}
