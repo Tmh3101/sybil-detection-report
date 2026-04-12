@@ -1,20 +1,21 @@
-\subsubsection{2.4. Bộ mã hóa tự động đồ thị (Graph Autoencoder – GAE)}
-\indent\indent Trong môi trường mạng xã hội phi tập trung, thách thức lớn nhất đối với việc huấn luyện các mô hình học sâu là sự thiếu hụt nghiêm trọng dữ liệu nhãn về các tài khoản giả mạo. Để giải quyết vấn đề này, nghiên cứu áp dụng cơ chế học biểu diễn không giám sát (Unsupervised Representation Learning) thông qua bộ mã hóa tự động đồ thị (Graph Autoencoder – GAE), như được minh họa cụ thể trong Hình \ref{fig:GAE}. Phương pháp này, được đề xuất bởi Kipf và Welling \cite{kipf2016variational}, cho phép mô hình tự tìm ra các đặc điểm cấu trúc tiềm ẩn và quy luật phân phối của các nhóm tài khoản dựa trên dữ liệu thô mà không cần sự can thiệp của nhãn thủ công.\vspace{0.3cm}
+\subsubsection{2.4. Bộ mã hóa tự động đồ thị tự động}
 
-Về mặt toán học, GAE hoạt động dựa trên hai thành phần cốt lõi là bộ mã hóa và bộ giải mã:\vspace{-0.1cm}
+\indent\indent Trong môi trường mạng xã hội phi tập trung, thách thức lớn nhất đối với việc huấn luyện các mô hình học sâu là sự thiếu hụt nghiêm trọng dữ liệu nhãn về các tài khoản giả mạo. Để giải quyết vấn đề này, nghiên cứu áp dụng cơ chế học biểu diễn không giám sát (Unsupervised Representation Learning) thông qua GAE, như được minh họa cụ thể trong Hình \ref{fig:GAE}. Phương pháp này, được đề xuất bởi Kipf và Welling \cite{kipf2016variational}, cho phép mô hình tự tìm ra các đặc điểm cấu trúc tiềm ẩn và quy luật phân phối của các nhóm tài khoản dựa trên dữ liệu thô mà không cần sự can thiệp của nhãn thủ công.\vspace{0.3cm}
+
+Về mặt toán học, GAE hoạt động dựa trên hai thành phần cốt lõi là bộ mã hóa và bộ giải mã:
 \begin{itemize}[label={--}, itemsep=1pt]
-    \item \textbf{Bộ mã hóa (Encoder):} Sử dụng các tầng mạng nơ-ron đồ thị (trong đề tài này là GATv2) để thực hiện phép biến đổi không gian dữ liệu. Đầu vào gồm ma trận đặc trưng nút $X$ (396 chiều) và cấu trúc đồ thị (ma trận kề $A$). Encoder nén dữ liệu này thành một ma trận nhúng $Z$ ở không gian thấp chiều hơn (16 chiều). Quá trình này giúp mô hình "đúc kết" các thông tin quan trọng nhất về hành vi và mối liên kết của người dùng.
+    \item \textbf{Bộ mã hóa (Encoder):} Sử dụng các tầng mạng nơ-ron đồ thị (trong đề tài này là GATv2) để thực hiện phép biến đổi không gian dữ liệu. Đầu vào gồm ma trận đặc trưng nút $X$ (396 chiều) và cấu trúc đồ thị (ma trận kề $A$). Encoder nén dữ liệu này thành một ma trận nhúng $Z$ ở không gian thấp chiều hơn (16 chiều). Quá trình này giúp mô hình đúc kết các thông tin quan trọng nhất về hành vi và mối liên kết của người dùng.
     \item \textbf{Bộ giải mã (Decoder):} Mục tiêu của Decoder là tái cấu trúc lại đồ thị gốc từ không gian nhúng $Z$. Cụ thể, khả năng liên kết giữa hai nút được dự đoán thông qua tích vô hướng của các vector nhúng tương ứng: $\hat{A} = \sigma(ZZ^T)$, trong đó $\sigma$ là hàm kích hoạt sigmoid.
 \end{itemize}
 
 \begin{figure}[H]
     \centering
-    \includegraphics[width=1\linewidth]{images/part-02/chap-01/GAE.png}
-    \vspace{0.5cm}
+    \includegraphics[width=0.85\linewidth]{images/part-02/chap-01/GAE.png}
+    \vspace{0.1cm}
     \caption{Quy trình học không giám sát của mô hình GAE}
     \label{fig:GAE}
 \end{figure}
 
 Việc tối ưu hóa GAE được thực hiện bằng cách giảm thiểu sai số tái cấu trúc (Reconstruction Loss) giữa đồ thị thực tế $A$ và đồ thị dự đoán $\hat{A}$. Thông qua quá trình này, các thực thể có hành vi mạng lưới tương đồng --- như các cụm tài khoản Sybil cùng thực hiện tương tác chéo hoặc cùng chung quyền sở hữu ví --- sẽ được ánh xạ vào các vị trí nằm gần nhau trong không gian nhúng 16 chiều. \vspace{0.3cm}
 
-Kết quả của giai đoạn này là các vector nhúng giàu thông tin ngữ cảnh và cấu trúc. Đây chính là tiền đề quan trọng để thuật toán K-Means thực hiện phân cụm rủi ro ở bước tiếp theo, biến bài toán thiếu nhãn ban đầu thành bài toán gán nhãn giả lập (Pseudo-labeling) có tính chính xác cao, tạo điều kiện cho các giai đoạn học có giám sát về sau.
+Kết quả của giai đoạn này là các vector nhúng giàu thông tin ngữ cảnh và cấu trúc. Đây chính là tiền đề quan trọng để thuật toán phân cụm ở bước tiếp theo, biến bài toán thiếu nhãn ban đầu thành bài toán gán nhãn giả lập (Pseudo-labeling) có tính chính xác cao, tạo điều kiện cho các giai đoạn học có giám sát về sau.

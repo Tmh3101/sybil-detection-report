@@ -1,10 +1,10 @@
-\subsubsection{2.3. Mạng nơ-ron đồ thị (GNN)}
-\indent\indent Mạng nơ-ron đồ thị là một lớp mô hình học sâu chuyên biệt được thiết kế để khai thác dữ liệu trong không gian phi Euclid. Theo đánh giá tổng quan của Zhang và cộng sự \cite{zhang2019graph}, mục tiêu của GNN là học các vector biểu diễn nút (\textit{node embeddings}) cấp thấp sao cho bảo tồn được cả đặc trưng nội tại của nút và cấu trúc liên kết phức tạp của mạng lưới. Trong bài toán này, GNN đóng vai trò là "bộ não" trích xuất các mẫu hành vi của các cụm Sybil từ đồ thị đa tầng.\vspace{0.3cm}
+\subsubsection{2.3. Mạng nơ-ron đồ thị}
+\indent\indent Mạng nơ-ron đồ thị là một lớp mô hình học sâu chuyên biệt được thiết kế để khai thác dữ liệu trong không gian phi Euclid. Theo Zhang và cộng sự \cite{zhang2019graph}, mục tiêu của GNN là học các vector biểu diễn nút (\textit{node embeddings}) sao cho bảo tồn được cả đặc trưng của nút và cấu trúc liên kết của mạng lưới. Trong bài toán này, GNN đóng vai trò là bộ não trích xuất hành vi của các cụm Sybil từ CMG.
 
 \begin{figure}[H]
     \centering
     \includegraphics[width=0.8\linewidth]{images/part-02/chap-01/GNN.png}
-    \vspace{0.5cm}
+    \vspace{0.1cm}
     \caption{Minh hoạ kiến trúc cơ bản của GNN}
     \label{fig:GNN}
 \end{figure}
@@ -13,49 +13,50 @@ Cơ chế hoạt động cốt lõi của GNN là truyền thông điệp (\text
 \[
     h_v^{(l)} = \text{UPDATE}^{(l)} \left( h_v^{(l-1)}, \text{AGGREGATE}^{(l)} \left( \{ h_u^{(l-1)} | u \in N(v) \} \right) \right)
 \]
-Trong đó $h_v^{(l)}$ là trạng thái ẩn của nút tại tầng $l$.
+Trong đó $h_v^{(l)}$ là trạng thái ẩn của nút tại tầng $l$ trong kiến trúc mô hình.
 
 \begin{figure}[H]
     \centering
     \includegraphics[width=0.8\linewidth]{images/part-02/chap-01/GNN_MessagePassing.png}
-    \vspace{0.5cm}
+    \vspace{0.1cm}
     \caption{Cơ chế truyền tin cơ bản trong mạng GNN}
     \label{fig:GNN_MP}
 \end{figure}
 
 \textbf{2.3.1. Các kiến trúc mạng nơ-ron đồ thị thực nghiệm}\vspace{0.2cm}
 
-Với đặc thù phức tạp của mạng lưới SocialFi, đề tài khôn    g giới hạn ở một kiến trúc duy nhất mà thiết lập một hệ thống thử nghiệm toàn diện. Năm kiến trúc GNN tiên tiến được triển khai và đánh giá để tìm ra mô hình nhận diện tài khoản giả mạo tối ưu nhất:
+Với đặc thù phức tạp của CMG, đề tài không giới hạn ở một kiến trúc duy nhất mà thiết lập một hệ thống thử nghiệm toàn diện. Năm kiến trúc GNN tiên tiến được triển khai và đánh giá để tìm ra mô hình tối ưu nhất:
 
 \begin{itemize}[label={--}, itemsep=5pt]
-    \item \textbf{Graph Attention Networks (GATv2):} Đóng vai trò là kiến trúc chủ đạo của hệ thống. GAT nguyên bản \cite{velickovic2017graph} tạo đột phá bằng cơ chế tự chú ý, nhưng bộc lộ giới hạn về "chú ý tĩnh", khiến mức độ quan trọng của láng giềng bị đánh giá toàn cục. Khắc phục rào cản này, Brody và cộng sự \cite{brody2021attentive} đã đề xuất GATv2 với cơ chế "chú ý động". Nhờ cơ chế chú ý động của GATv2, mô hình trở nên linh hoạt hơn trong việc phân bổ trọng số, từ đó bước đầu học được cách dồn sự chú ý vào các liên kết mang tín hiệu quyết định. Bản chất toán học của kiến trúc GATv2 nguyên bản được thể hiện qua các bước sau:
+    \item \textbf{Graph Attention Networks (GATv2):} Đóng vai trò là kiến trúc chủ đạo của hệ thống. GAT nguyên bản \cite{velickovic2017graph} tạo đột phá bằng cơ chế tự chú ý, nhưng bộc lộ giới hạn trong chú ý tĩnh, khiến mức độ quan trọng của láng giềng bị đánh giá toàn cục. Khắc phục rào cản này, Brody và cộng sự \cite{brody2021attentive} đã đề xuất GATv2 với cơ chế chú ý động. Nhờ cơ chế này của GATv2, mô hình trở nên linh hoạt hơn trong việc phân bổ trọng số, từ đó bước đầu học được cách dồn sự chú ý vào các liên kết mang tín hiệu quyết định. Bản chất toán học của kiến trúc GATv2 nguyên bản được thể hiện qua các bước sau:
     \begin{itemize}[label={+}, itemsep=2pt]
-        \item \textbf{Hệ số chú ý chưa chuẩn hóa} $e_{ij}$ được tính bằng cách ghép nối vector đặc trưng của hai nút, biến đổi tuyến tính và áp dụng hàm phi tuyến trước khi nhân với vector chú ý:
+        \item \textbf{Hệ số chú ý chưa chuẩn hóa} $e_{ij}$ được tính bằng cách ghép nối vector đặc trưng của hai nút, biến đổi tuyến tính qua ma trận chú ý và áp dụng hàm phi tuyến trước khi nhân với vector chú ý:
         \[
-            e_{ij} = \vec{a}^T \text{LeakyReLU}\left( \mathbf{W} [h_i \| h_j] \right)
+            e_{ij} = \vec{a}^T \text{LeakyReLU}\left( \mathbf{W}_{att} [h_i \| h_j] \right)
         \]
-        Trong đó: $h_i, h_j$ là vector đặc trưng ẩn của nút gốc $i$ và láng giềng $j$; $\mathbf{W}$ là ma trận trọng số học được; $\vec{a}$ là vector chú ý.
+        Trong đó: $h_i, h_j$ là vector đặc trưng ẩn của nút gốc $i$ và láng giềng $j$; $\mathbf{W}_{att}$ là ma trận trọng số chú ý học được; $\vec{a}$ là vector chú ý.
         
-        \item \textbf{Trọng số chú ý} $\alpha_{ij}$ được chuẩn hóa bằng hàm softmax để có thể so sánh giữa các láng giềng:
+        \item \textbf{Trọng số chú ý} $\alpha_{ij}$ được chuẩn hóa với hàm softmax:
         \[
-            \alpha_{ij} = \frac{\exp(e_{ij})}{\sum_{k \in N_i} \exp(e_{ik})}
-        \]
-        
-        \item \textbf{Vector đầu ra} được tổng hợp bằng cách tính tổng có trọng số và đưa qua hàm phi tuyến, trong nghiên cứu này là hàm ELU:
-        \[
-            \vec{h}'_i = \text{ELU} \left( \sum_{j \in N_i} \alpha_{ij} \mathbf{W}\vec{h}_j \right)
+            \alpha_{ij} = \text{softmax}(e_{ij}) = \frac{\exp(e_{ij})}{\sum_{k \in N_i} \exp(e_{ik})}
         \]
         
-        \item Mô hình tích hợp \textbf{\textit{Multi-head Attention}} tương tự Transformer \cite{vaswani2017attention} để ổn định quá trình học, ghép nối ở tầng ẩn và lấy trung bình ở tầng đầu ra.
+        \item \textbf{Vector đầu ra} được tính bằng cách tổng có trọng số các đặc trưng láng giềng đã biến đổi tuyến tính, sau đó đưa qua hàm phi tuyến ELU:
+        \[
+            \vec{h}'_i = \text{ELU} \left( \sum_{j \in N_i} \alpha_{ij} \mathbf{W}_v\vec{h}_j \right)
+        \]
+        Trong đó $\mathbf{W}_v$ là ma trận trọng số đặc trưng học được.
+        
+        \item Mô hình tích hợp \textbf{\textit{Multi-head Attention}} tương tự Transformer \cite{vaswani2017attention} để ổn định quá trình học, thực hiện ghép nối ở tầng ẩn và lấy trung bình ở tầng đầu ra.
     \end{itemize}
 
-    \item \textbf{Graph Convolutional Networks (GCN):} Dựa trên công trình nền tảng của Kipf và Welling \cite{kipf2016variational}, GCN sử dụng phép xấp xỉ bậc nhất của tích chập phổ đồ thị để lan truyền và tổng hợp thông tin. Trong khung thử nghiệm của đề tài, mô hình này được triển khai để đóng vai trò là thước đo đối chứng cơ sở. Khác biệt cốt lõi với cơ chế chú ý động của GAT là GCN sử dụng cơ chế tổng hợp mang đặc trưng của một bộ lọc tĩnh. Tính chất này được thể hiện qua công thức lan truyền đa tầng ở dạng ma trận:
+    \item \textbf{Graph Convolutional Networks (GCN):} Dựa trên công trình nền tảng của Kipf và Welling \cite{kipf2017semi}, GCN sử dụng phép xấp xỉ bậc nhất của tích chập phổ đồ thị để lan truyền và tổng hợp thông tin. Khác biệt cốt lõi với cơ chế chú ý động của GATv2 là GCN vận hành dựa trên một bộ lọc tĩnh, nơi trọng số lan truyền được cố định dựa trên cấu trúc hình học của đồ thị thay vì nội dung đặc trưng nút. Tính chất này được thể hiện qua công thức lan truyền đa tầng ở dạng ma trận:
     \[
         H^{(l+1)} = \sigma\left( \tilde{D}^{-1/2} \tilde{A} \tilde{D}^{-1/2} H^{(l)} \mathbf{W}^{(l)} \right)
     \]
     Trong đó, $H^{(l)}$ là ma trận đặc trưng của các nút tại tầng $l$; $\mathbf{W}^{(l)}$ là ma trận trọng số học được; $\tilde{A}$ là ma trận kề đã thêm vòng lặp tự thân (\textit{self-loops}) và $\tilde{D}$ là ma trận bậc đường chéo tương ứng.\vspace{0.3cm}
 
-    Bản chất "tĩnh" và sự hạn chế của GCN nguyên bản được bộc lộ rõ nhất khi xét quá trình lan truyền thông điệp từ láng giềng $j$ đến nút $i$ ở cấp độ từng nút:
+    Cơ chế chú ý tĩnh và sự hạn chế của GCN nguyên bản được bộc lộ rõ nhất khi xét quá trình lan truyền thông điệp từ láng giềng $j$ đến nút $i$ ở cấp độ từng nút:
     \[
         h_i^{(l+1)} = \sigma \left( \sum_{j \in \mathcal{N}(i) \cup \{i\}} \frac{1}{\sqrt{\tilde{d}_i \tilde{d}_j}} \mathbf{W}^{(l)} h_j^{(l)} \right)
     \]
@@ -93,7 +94,7 @@ Với kiến trúc đồ thị đa quan hệ có trọng số, các thực thể
 \begin{itemize}[label={--}, itemsep=5pt]
         \item \textbf{Tối ưu kiến trúc GATv2 (Edge-augmented GATv2):} Để kiến trúc này tận dụng tối đa tham số $w_{ij}$ vừa được nén, đề tài thiết lập cơ chế \textit{dung hợp sớm trọng số cạnh}. Trọng số cạnh $w_{ij}$ được tích hợp trực tiếp vào quá trình tính toán hệ số chú ý thông qua phép cộng tuyến tính trước hàm kích hoạt phi tuyến:
         \[
-            e_{ij} = \vec{a}^T \text{LeakyReLU}\left( \mathbf{W}_n [h_i \| h_j] + \mathbf{W}_e w_{ij} \right)
+            e_{ij} = \vec{a}^T \text{LeakyReLU}\left( \mathbf{W}_{att} [h_i \| h_j] + \mathbf{W}_e w_{ij} \right)
         \]
         Trong đó, $\mathbf{W}_e$ là vector tham số học được đóng vai trò phóng chiếu trọng số vô hướng $w_{ij}$ vào cùng không gian ẩn với đặc trưng nút. Việc tối ưu hóa bằng cách đặt tham số cạnh vào bên trong hàm LeakyReLU ép mạng nơ-ron phải dẫn dắt sự chú ý dựa trên tương tác chéo giữa bản chất thực thể và chi phí hành vi ($w_{ij}$).
 
@@ -113,7 +114,7 @@ Với kiến trúc đồ thị đa quan hệ có trọng số, các thực thể
             \]
             Tinh chỉnh này đảm bảo mô hình không bị mất mát tín hiệu hành vi, kết hợp hoàn hảo giữa hình học tô-pô và định lượng hành vi trên mạng xã hội phi tập trung.
 
-            \item \textbf{Principal Neighbourhood Aggregation (PNA):} Để khắc phục điểm mù về thông tin giao dịch của các toán tử thống kê, hệ thống áp dụng cơ chế dung hợp sớm thông qua mạng tiền xử lý \texttt{pre\_layers = 1} (kí hiệu là $\text{MLP}_{pre}$). "Công thức truyền tin được tùy chỉnh mở rộng:
+            \item \textbf{Principal Neighbourhood Aggregation (PNA):} Để khắc phục điểm mù về thông tin giao dịch của các toán tử thống kê, hệ thống áp dụng cơ chế dung hợp sớm thông qua mạng tiền xử lý \texttt{pre\_layers = 1} (kí hiệu là $\text{MLP}_{pre}$). Công thức truyền tin được tùy chỉnh mở rộng:
             \[
                 h_i^{(l+1)} = \text{MLP}_{post} \left( h_i^{(l)}, \bigoplus_{j \in \mathcal{N}(i)} \text{MLP}_{pre} \left( h_j^{(l)} \parallel w_{ij} \right) \right)
             \]

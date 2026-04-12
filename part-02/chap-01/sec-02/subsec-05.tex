@@ -1,21 +1,22 @@
-\subsubsection{2.5. Thuật toán phân cụm và hệ thống luật (Pseudo-labeling)}
-\indent\indent Mục tiêu của giai đoạn này là thiết lập một quy trình gán nhãn tự động dựa trên sự kết hợp giữa phân nhóm cấu trúc và các bằng chứng về hành vi. Quy trình này lấy cảm hứng từ mô hình lập trình dữ liệu và học giám sát yếu (\textit{Weak Supervision}) \cite{ratner2017snorkel}, cho phép tận dụng tri thức chuyên gia để tạo ra bộ dữ liệu huấn luyện chất lượng cao cho các mô hình học có giám sát ở giai đoạn tiếp theo.\vspace{0.3cm}
+\subsubsection{2.5. Thuật toán phân cụm và hệ thống luật}
 
-\textbf{2.5.1. Phân cụm không giám sát với K-Means}\vspace{0.2cm}
+\indent\indent Mục tiêu của giai đoạn này là thiết lập một quy trình gán nhãn tự động dựa trên sự kết hợp giữa phân nhóm cấu trúc và các bằng chứng về hành vi. Quy trình này lấy cảm hứng từ mô hình lập trình dữ liệu và học giám sát yếu \cite{ratner2017snorkel}, cho phép tận dụng tri thức chuyên gia để tạo ra bộ dữ liệu huấn luyện chất lượng cao cho các mô hình học có giám sát ở giai đoạn tiếp theo.\vspace{0.3cm}
 
-\indent\indent Hệ thống sử dụng thuật toán K-Means \cite{macqueen1967some} để phân nhóm các vector nhúng (\textit{node embeddings}) thu được từ bộ mã hóa GAE. Đầu vào của thuật toán là ma trận biểu diễn đồ thị ẩn chứa thông tin về cấu trúc liên kết và ngữ nghĩa hồ sơ.\vspace{0.3cm}
+\textit{2.5.1. Phân cụm với K-Means}\vspace{0.2cm}
 
-\indent\indent Khác với các phương pháp thử sai truyền thống trên một không gian tham số vô hạn, nghiên cứu đề xuất chiến lược khoanh vùng không gian tìm kiếm cho số lượng cụm $K$ dựa trên lý thuyết cấu trúc cộng đồng trong mạng quy mô lớn của Leskovec và cộng sự \cite{leskovec2009community}. Theo đó, đồ thị mạng xã hội thường tuân theo cấu trúc "Lõi - Rìa" (\textit{Core-Whisker}), trong đó phần lõi đặc chiếm khoảng $60\%$ tổng số nút, và $40\%$ còn lại phân tán thành các cộng đồng nhỏ ở rìa.\vspace{0.3cm}
+Nghiên cứu sử dụng thuật toán K-Means \cite{macqueen1967some} để phân nhóm các vector biểu diễn nút thu được từ bộ mã hóa GAE. Đầu vào của thuật toán là ma trận biểu diễn đồ thị ẩn chứa thông tin về cấu trúc liên kết và ngữ nghĩa hồ sơ.\vspace{0.3cm}
 
-\indent\indent Áp dụng nguyên lý này vào bài toán hiện tại, hệ thống thiết lập giả thuyết rằng các mạng lưới Sybil thường hoạt động thành các nhóm. Dựa trên quy mô $N$ của từng tập dữ liệu (tuần, tháng, quý), khoảng khảo sát của tham số $K$ được tính toán ngược sao cho kích thước trung bình của các cụm ở vùng rìa luôn bị ép vào khoảng tối ưu (dao động từ vài nút đến dưới 30 nút/cụm).\vspace{0.3cm}
+Khác với các phương pháp thử sai truyền thống trên một không gian tham số vô hạn, nghiên cứu đề xuất chiến lược khoanh vùng không gian tìm kiếm cho số lượng cụm $K$ dựa trên lý thuyết cấu trúc cộng đồng trong mạng quy mô lớn của Leskovec và cộng sự \cite{leskovec2009community}. Theo đó, đồ thị mạng xã hội thường tuân theo cấu trúc \textit{Core-Whisker}, trong đó phần lõi đặc chiếm khoảng $60\%$ tổng số nút, và $40\%$ còn lại phân tán thành các cộng đồng nhỏ ở rìa.\vspace{0.3cm}
 
-\indent\indent Sau khi không gian tìm kiếm đã được giới hạn chặt chẽ bởi lý thuyết đồ thị, giá trị $K$ tối ưu cuối cùng được xác định thông qua thực nghiệm nhằm tối ưu hóa đồng thời hai chỉ số: Hệ số Silhouette - đo lường độ tách biệt giữa các cụm \cite{rousseeuw1987silhouettes} và Chỉ số Davies-Bouldin - đo lường độ nén bên trong cụm \cite{davies1979cluster}. Cách tiếp cận kết hợp này không chỉ tiết kiệm đáng kể chi phí tính toán mà còn đảm bảo các điểm cực trị của thuật toán phản ánh đúng bản chất hành vi tổ chức của các thực thể độc hại.\vspace{0.3cm}
+Áp dụng nguyên lý này vào bài toán hiện tại, hệ thống thiết lập giả thuyết rằng các mạng lưới Sybil thường hoạt động thành các nhóm. Dựa trên quy mô $N$ của từng tập dữ liệu (tuần, tháng, quý), khoảng khảo sát của tham số $K$ được tính toán ngược sao cho kích thước trung bình của các cụm ở vùng rìa luôn bị ép vào khoảng tối ưu.\vspace{0.3cm}
+
+Sau khi không gian tìm kiếm đã được giới hạn chặt chẽ bởi lý thuyết đồ thị, giá trị $K$ tối ưu cuối cùng được xác định thông qua thực nghiệm nhằm tối ưu hóa đồng thời hai chỉ số: \textit{Hệ số Silhouette} - đo lường độ tách biệt giữa các cụm \cite{rousseeuw1987silhouettes} và \textit{Chỉ số Davies-Bouldin} - đo lường độ nén bên trong cụm \cite{davies1979cluster}. Cách tiếp cận kết hợp này không chỉ tiết kiệm đáng kể chi phí tính toán mà còn đảm bảo các điểm cực trị của thuật toán phản ánh đúng bản chất hành vi tổ chức của các thực thể độc hại.\vspace{0.3cm}
 
 %=============================================================
 
-\textbf{2.5.2. Hệ thống luật suy diễn (Heuristics) và cơ chế định lượng rủi ro}\vspace{0.2cm}
+\textit{2.5.2. Hệ thống luật chuyên gia và định lượng rủi ro}\vspace{0.2cm}
 
-\indent\indent Sau bước phân cụm, nghiên cứu này thực hiện tính toán các chỉ số thống kê tổng hợp cho từng nhóm. Các chỉ số này đóng vai trò là tham số đầu vào cho các hàm gán nhãn theo tri thức chuyên gia \cite{ratner2017snorkel}, nhằm thiết lập một cơ chế định lượng điểm rủi ro (từ $0$ đến $100$) cho từng cụm. Cụ thể, các chỉ số trọng yếu được trích xuất bao gồm:\vspace{-0.1cm}
+Sau bước phân cụm, nghiên cứu này thực hiện tính toán các chỉ số thống kê tổng hợp cho từng nhóm. Các chỉ số này đóng vai trò là tham số đầu vào cho các hàm gán nhãn theo tri thức chuyên gia \cite{ratner2017snorkel}, nhằm thiết lập một cơ chế định lượng điểm rủi ro (từ $0$ đến $100$) cho từng cụm. Cụ thể, các chỉ số trọng yếu được trích xuất bao gồm:\vspace{-0.1cm}
 \begin{itemize}[label={--}, itemsep=1pt]
     \item \texttt{avg\_trust}: Điểm tin cậy trung bình dựa trên lịch sử hoạt động trên \textit{Lens Protocol}.
     \item \texttt{std\_creation\_hours}: Độ lệch chuẩn thời gian khởi tạo tài khoản trong cụm.
@@ -24,7 +25,7 @@
     \item \texttt{pct\_social}: Cường độ tương tác xã hội thực tế (gồm các nối kết trong tầng Theo dõi và Tương tác).
 \end{itemize}
 
-\indent\indent Dựa trên các chỉ số định lượng trên, hệ thống luật suy diễn được xây dựng như một sự giao thoa giữa các kỹ thuật phòng thủ kinh điển trong mạng xã hội truyền thống và các quy tắc tùy chỉnh đặc thù cho môi trường Web3. Chi tiết các tiêu chí vi phạm và trọng số điểm phạt được trình bày trong Bảng \ref{tab:heuristics} dưới đây.
+Dựa trên các chỉ số định lượng trên, hệ thống luật suy diễn được xây dựng như một sự giao thoa giữa các kỹ thuật phòng thủ kinh điển trong mạng xã hội truyền thống và các quy tắc tùy chỉnh đặc thù cho môi trường Web3. Chi tiết các tiêu chí vi phạm và trọng số điểm phạt được trình bày trong Bảng \ref{tab:heuristics} dưới đây.
 
 \begin{table}[H]
     \centering
@@ -41,32 +42,45 @@
         \hline
         Mạng lưới đồng sở hữu & \texttt{pct\_co\_owner} $> 5\%$ & $+50$ & \textbf{Đề xuất của nghiên cứu:} Bằng chứng xác thực về tính sở hữu của Web3 khi một ví quản lý nhiều tài khoản. \\
         \hline
-        Tương tác xã hội thấp & \texttt{pct\_social} $\leq 20\%$ & $+10$ & \textbf{Đề xuất của nghiên cứu:} Phản ánh đặc tính của Sybil sinh ra chỉ để trục lợi (\textit{airdrop}). \\
+        Tương tác xã hội thấp & \texttt{pct\_social} $\leq 20\%$ & $+10$ & \textbf{Đề xuất của nghiên cứu:} Phản ánh đặc tính của Sybil sinh ra chỉ để trục lợi. \\
         \hline
         Điểm tin cậy nền tảng thấp & \texttt{avg\_trust} $\leq 5$ & $+20$ & \textbf{Đề xuất của nghiên cứu:} Đánh giá dựa trên độ uy tín trên nền tảng Lens Protocol. \\
         \hline
     \end{tabular}
 \end{table}
 
-\indent\indent Tổng điểm rủi ro của một cụm $C$ được tổng hợp từ các lỗi vi phạm và tính toán thông qua hàm giới hạn trần để đảm bảo điểm không vượt quá ngưỡng tối đa:\vspace{-0.1cm}
+Tổng điểm rủi ro của một cụm $C$ được tổng hợp từ các lỗi vi phạm và tính toán thông qua hàm giới hạn trần để đảm bảo điểm không vượt quá ngưỡng tối đa:\vspace{-0.1cm}
 \[
     \text{S}_{\text{risk}}(C) = \min \left( \sum_{i=1}^{n} \text{Rule}_i, 100 \right)
 \]
 
 %=============================================================
 
-\textbf{2.5.3. Phân lớp mờ và gán nhãn giả định (Pseudo-labeling)}\vspace{0.2cm}
+\textit{2.5.3. Gán nhãn giả định}\vspace{0.2cm}
 
-\indent\indent Dựa trên dải điểm rủi ro thu được, hệ thống áp dụng kỹ thuật gán nhãn giả định (\textit{Pseudo-labeling}) \cite{lee2013pseudo} để chuyển đổi các cụm thành 4 lớp phân loại. Các nhãn này sau đó được gán trực tiếp cho toàn bộ các nút thuộc cụm tương ứng:\vspace{-0.1cm} 
+Dựa trên dải điểm rủi ro thu được, hệ thống áp dụng kỹ thuật gán nhãn giả định\cite{lee2013pseudo} để chuyển đổi các cụm thành 4 lớp phân loại. Các nhãn này sau đó được gán trực tiếp cho toàn bộ các nút thuộc cụm tương ứng:
 \begin{itemize}[label={--}, itemsep=1pt]
-    \item \textbf{0\_BENIGN (0 - 20 điểm):} Nhóm người dùng thật, hoạt động với các tiêu chuẩn của cộng đồng.
-    \item \textbf{1\_LOW\_RISK (21 - 50 điểm):} Nhóm tài khoản đáng ngờ, có dấu hiệu Sybil ở mức độ nhẹ.
-    \item \textbf{2\_HIGH\_RISK (51 - 80 điểm):} Nhóm rủi ro cao, có biểu hiện của việc sử dụng phần mềm tự động hóa.
-    \item \textbf{3\_MALICIOUS (81 - 100 điểm):} Mạng lưới Sybil, vi phạm nghiêm trọng các ràng buộc bảo mật.
+    \item \textbf{BENIGN (0 - 20 điểm):} Nhóm người dùng thật, hoạt động với các tiêu chuẩn của cộng đồng.
+    \item \textbf{LOW\_RISK (21 - 50 điểm):} Nhóm tài khoản đáng ngờ, có dấu hiệu Sybil ở mức độ nhẹ.
+    \item \textbf{HIGH\_RISK (51 - 80 điểm):} Nhóm rủi ro cao, có biểu hiện của việc sử dụng phần mềm tự động hóa.
+    \item \textbf{MALICIOUS (81 - 100 điểm):} Mạng lưới Sybil, vi phạm nghiêm trọng các ràng buộc bảo mật.
 \end{itemize}
 
 %=============================================================
 
-\textbf{2.5.4. Xác thực và hiệu chuẩn nhãn (cần chỉnh sửa lại)}\vspace{0.2cm}
+\textit{2.5.4. Quy trình kiểm chứng phân tầng và hiệu chuẩn nhãn}\vspace{0.2cm}
 
-\indent\indent Để đảm bảo bộ nhãn giả không làm nhiễu quá trình huấn luyện của mạng GNN ở giai đoạn sau, hệ thống thực hiện bước xác thực chéo. Một mẫu dữ liệu ngẫu nhiên từ các cụm có điểm rủi ro nằm ở vùng biên (gần ngưỡng chuyển nhãn) sẽ được rà soát và đối chiếu thủ công. Nếu tỷ lệ sai lệch vượt quá ngưỡng cho phép, các trọng số điểm phạt trong Bảng \ref{tab:heuristics} sẽ được tinh chỉnh lại nhằm phản ánh chính xác nhất thực trạng hành vi của bot farm tại thời điểm thu thập dữ liệu.
+Để đảm bảo tính khách quan và độ tin cậy của bộ nhãn giả định \cite{lee2013pseudo} trước khi đưa vào huấn luyện mạng GNN, hệ thống triển khai quy trình kiểm chứng chéo. Mục tiêu của giai đoạn này là rà soát sự tương quan giữa các đặc trưng thô và nhãn dự kiến để tinh chỉnh hệ thống luật, một phương pháp tiếp cận dựa trên giám sát yếu (\textit{weak supervision}) nhằm tối ưu hóa quá trình tạo dữ liệu huấn luyện \cite{ratner2017snorkel}.\vspace{0.3cm}
+
+Thay vì rà soát ngẫu nhiên trên toàn bộ không gian dữ liệu, hệ thống thực hiện lấy mẫu phân tầng dựa trên các lớp rủi ro $\mathcal{L} \in \{ \text{BENIGN}, \allowbreak \text{LOW\_RISK}, \allowbreak \text{HIGH\_RISK}, \allowbreak \text{MALICIOUS} \}$. Quy trình trích xuất tập trung vào hai nhóm đối tượng:
+\begin{itemize}[label={--}, itemsep=1pt]
+    \item \textbf{Cụm đại diện kích thước lớn:} Các cụm có số lượng nút vượt trội trong mỗi lớp để đánh giá tính ổn định của các quy tắc phân loại chung.
+    \item \textbf{Cụm ranh giới:} Các cụm có điểm rủi ro tiệm cận ngưỡng chuyển đổi nhãn. Việc rà soát các cụm này giúp phát hiện các biến thể Sybil tinh vi.
+\end{itemize}
+
+Mỗi mẫu cụm sau khi trích xuất sẽ được phân tích định lượng qua ba trụ cột bằng chứng để xác thực nhãn:
+\begin{itemize}[label={--}, itemsep=1pt]
+    \item \textbf{Xác thực Tầng đồng sở hữu:} Truy vết mối quan hệ đồng sở hữu. Tỷ lệ nút trong cùng một cụm được sở hữu bởi một cá nhận hoặc tổ chức là bằng chứng quan trọng nhất cho hành vi vận hành tập trung.
+    \item \textbf{Xác thực Thời gian:} Đánh giá dựa trên độ lệch chuẩn thời gian khởi tạo tài khoản ($\sigma_{time}$). Hệ thống thiết lập các ngưỡng chuẩn cho hành vi tự nhiên; các giá trị $\sigma_{time}$ cực thấp là chỉ báo của việc tạo tài khoản hàng loạt.
+    \item \textbf{Xác thực Nội dung:} Tương đồng hồ sơ và tên định danh tài khoản. Các cấu trúc tên tài khoản có quy luật hoặc nội dung tiểu sử trùng lặp cao là cơ sở để xác định tính tự động của thực thể.
+\end{itemize}

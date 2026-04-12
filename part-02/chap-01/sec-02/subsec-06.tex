@@ -1,4 +1,5 @@
-\subsubsection{2.6. Kiến trúc phân lớp tách rời (Decoupled Machine Learning)}
+\subsubsection{2.6. Kiến trúc phân lớp tách rời (Decoupled GNN-ML)}
+
 \indent\indent Trong các kiến trúc mạng nơ-ron đồ thị truyền thống, quy trình huấn luyện thường được thực hiện theo cơ chế đầu cuối, nơi các tầng tích chập GNN kết nối trực tiếp với một lớp phân loại tuyến tính. Tuy nhiên, phương pháp này thường gặp hạn chế do các lớp nơ-ron trong mạng đồ thị thuần túy thường khó thiết lập các ranh giới phân loại một cách rõ ràng — một đặc điểm phân phối cốt lõi của dữ liệu hành vi dạng bảng. Theo Ivanov và Prokhorenkova trong nghiên cứu về \textit{Boosted Graph Neural Networks} \cite{ivanov2021boosted}, các nơ-ron thiếu chính xác khi đối mặt với các ngưỡng điều kiện nghiêm ngặt.\vspace{0.3cm}
 
 Để khắc phục vấn đề này, đề tài đề xuất kiến trúc phân lớp tách rời. Thay vì sử dụng GNN để phân lớp trực tiếp, hệ thống sử dụng mạng nơ-ron đồ thị như một bộ trích xuất đặc trưng. Phương pháp này dựa trên luận điểm của Grover và Leskovec trong nghiên cứu \texttt{node2vec} \cite{grover2016node2vec}, khẳng định rằng các mô hình học trên đồ thị có khả năng chuyển đổi cấu trúc liên kết và ngữ nghĩa nút thành các vector biểu diễn (\textit{node embeddings}) giàu thông tin, sẵn sàng cho các tác vụ phân lớp phía sau.\vspace{0.3cm}
@@ -12,5 +13,3 @@ Sau khi thu được các vector nhúng từ GNN, đề tài thực hiện thử
     \item \textbf{Random Forest (RF):} Mô hình tập hợp theo cơ chế \textit{Bagging}, giúp giảm thiểu phương sai và hiện tượng quá khớp \cite{breiman2001random}.
     \item \textbf{XGBoost:} Thuật toán tối ưu hóa theo cơ chế \textit{Gradient Boosting}, giúp tăng cường độ chính xác thông qua việc xây dựng các ranh giới phân tách siêu phẳng dựa trên việc học từ sai số \cite{chen2016xgboost}.
 \end{itemize}
-
-Hơn nữa, việc phối hợp kiến trúc GNN (như GATv2) kết hợp với các mô hình họ cây (\textit{RF/XGBoost}) không chỉ cải thiện hiệu năng dự đoán mà còn đóng vai trò then chốt trong việc giải thích mô hình. Thông qua việc bóc tách mức độ đóng góp của từng chiều nhúng, hệ thống có thể nhận diện các "ngưỡng hành vi" quyết định khiến một thực thể bị đánh dấu rủi ro, đáp ứng mục tiêu phát hiện Sybil có khả năng giải thích của đề tài.

@@ -1,15 +1,9 @@
-\subsubsection{2.7. Chiến lược huấn luyện và xử lý mất cân bằng dữ liệu}
+\subsubsection{2.7. Xử lý mất cân bằng dữ liệu với trọng số lớp}
 
-\indent\indent Để đảm bảo tính khách quan và khả năng tổng quát hóa của các mô hình học có giám sát, tập dữ liệu đồ thị được phân chia như sau: 60\% cho tập huấn luyện, 20\% cho tập đánh giá và 20\% cho tập kiểm thử. Đảm bảo tỷ lệ phân bố của 4 lớp nhãn (\texttt{BENIGN, LOW\_RISK, HIGH\_RISK, MALICIOUS}) được bảo toàn đồng đều trên cả ba tập, ngăn chặn hiện tượng thiếu hụt mẫu của các lớp thiểu số trong quá trình đánh giá.\vspace{0.3cm}
-
-Đối mặt với đặc thù mất cân bằng nghiêm trọng của dữ liệu mạng xã hội phi tập trung, việc tối ưu hóa bằng hàm mất mát tiêu chuẩn sẽ khiến mạng GNN có xu hướng thiên vị lớp đa số để đạt \textit{Accuracy} cao. Để giải quyết triệt để vấn đề này, hệ thống áp dụng kỹ thuật Học nhạy cảm với chi phí (\textit{Cost-sensitive Learning}) \cite{he2009learning} bằng cách tích hợp trọng số lớp (\textit{Class Weights}) trực tiếp vào hàm mất mát \textit{Cross-Entropy}.\vspace{0.3cm}
+\indent\indent Đối mặt với đặc thù mất cân bằng nghiêm trọng của dữ liệu mạng xã hội phi tập trung, việc tối ưu hóa bằng hàm mất mát tiêu chuẩn sẽ khiến mạng GNN có xu hướng thiên vị lớp đa số để đạt \textit{Accuracy} cao. Để giải quyết triệt để vấn đề này, hệ thống áp dụng kỹ thuật Học nhạy cảm với chi phí (\textit{Cost-sensitive Learning}) \cite{he2009learning} bằng cách tích hợp trọng số lớp (\textit{Class Weights}) trực tiếp vào hàm mất mát \textit{Cross-Entropy}.\vspace{0.3cm}
 
 Trọng số $\alpha_c$ cho từng lớp $c$ được tính toán dựa trên tần suất xuất hiện của lớp đó trong tập huấn luyện theo công thức cân bằng được chuẩn hóa rộng rãi trong các hệ thống học máy \cite{pedregosa2011scikit}:
 \[
     \alpha_c = \frac{N}{C \times N_c}
 \]
-Trong đó, $N$ là tổng số nút trong tập huấn luyện, $C$ là tổng số lượng lớp phân loại (trong trường hợp này $C=4$), và $N_c$ là số lượng nút thực tế thuộc lớp $c$. 
-
-Thông qua cơ chế nghịch đảo tần suất này, các lỗi dự đoán sai trên lớp thiểu số sẽ phải chịu phạt lớn hơn rất nhiều trong quá trình cập nhật gradient. Kỹ thuật này ép mạng nơ-ron phải tập trung trích xuất đặc trưng của các cụm Sybil độc hại thay vì hội tụ vào một giải pháp an toàn mang tính rập khuôn theo số đông.\vspace{0.3cm}
-
-Đồng bộ với kỹ thuật điều chỉnh hàm mất mát, hệ thống sử dụng \textit{Macro F1-Score} \cite{sokolova2009systematic} làm thang đo giám sát cốt lõi trong suốt quá trình huấn luyện (để quyết định dừng sớm - \textit{Early Stopping}) và lựa chọn mô hình. Cơ chế này đối xử hoàn toàn bình đẳng giữa các nhóm nhãn, buộc mô hình phải duy trì hiệu năng cao trên cả nhiệm vụ nhận diện các cụm Sybil lẫn bảo vệ người dùng thật, từ đó đánh giá đúng thực chất năng lực phân tách đa lớp của kiến trúc mạng.
+Trong đó, $N$ là tổng số nút trong tập huấn luyện, $C$ là tổng số lượng lớp phân loại (trong trường hợp này $C=4$), và $N_c$ là số lượng nút thực tế thuộc lớp $c$. \vspace{0.3cm}
