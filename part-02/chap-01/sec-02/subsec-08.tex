@@ -1,10 +1,10 @@
 \subsubsection{2.8. Thang đo hiệu năng cho dữ liệu mất cân bằng}
 \label{sec:metrics}
 
-\indent\indent Trong bài toán hiện tại, dữ liệu thực tế luôn tồn tại sự chênh lệch rất lớn. Do bài toán được thiết lập dưới dạng phân loại đa lớp với $C=4$ nhãn, việc chỉ dựa vào tỷ lệ dự đoán đúng là không đủ để đánh giá toàn diện. Hệ thống đánh giá trong nghiên cứu này được xây dựng dựa trên Ma trận nhầm lẫn đa lớp (\textit{Multi-class Confusion Matrix}) \cite{fawcett2006introduction}. Kế thừa hệ thống thang đo của Sokolova và Lapalme \cite{sokolova2009systematic}, đề tài thiết lập các tiêu chuẩn đánh giá theo chiến lược "Một-chống-lại-tất-cả" (\textit{One-vs-Rest - OvR}) cho từng lớp $i$ như sau:\vspace{-0.1cm}
+\indent\indent Trong bài toán hiện tại, dữ liệu thực tế luôn tồn tại sự chênh lệch rất lớn. Do bài toán được thiết lập dưới dạng phân loại đa lớp với $C=4$ nhãn, việc chỉ dựa vào tỷ lệ dự đoán đúng là không đủ để đánh giá toàn diện. Hệ thống đánh giá trong nghiên cứu này được xây dựng dựa trên Ma trận nhầm lẫn đa lớp (\textit{Multi-class Confusion Matrix}). Kế thừa hệ thống thang đo của Sokolova và Lapalme \cite{sokolova2009systematic}, đề tài thiết lập các tiêu chuẩn đánh giá theo chiến lược "Một-chống-lại-tất-cả" (\textit{One-vs-Rest - OvR}) cho từng lớp $i$ như sau:\vspace{-0.1cm}
 
 \begin{itemize}[label={--}, itemsep=1pt]
-    \item \textbf{Accuracy (Độ chính xác tổng thể):} Là tỷ lệ tổng số mẫu được dự đoán đúng trên toàn bộ tập dữ liệu. Trong bối cảnh phân bố lớp bất đối xứng, chỉ số này không mang tính quyết định vì mô hình chỉ cần thiên vị hoàn toàn lớp đa số (\texttt{BENIGN}) là đã có thể đạt điểm số rất cao \cite{sokolova2009systematic}. Do đó, Accuracy chỉ được sử dụng làm tham chiếu bổ trợ.
+    \item \textbf{Accuracy (Độ chính xác tổng thể):} Là tỷ lệ tổng số mẫu được dự đoán đúng trên toàn bộ tập dữ liệu. Trong bối cảnh phân bố lớp bất đối xứng, chỉ số này không mang tính quyết định vì mô hình chỉ cần thiên vị hoàn toàn lớp đa số (\texttt{BENIGN}) là đã có thể đạt điểm số rất cao. Do đó, Accuracy chỉ được sử dụng làm tham chiếu bổ trợ.
     \[
         \text{Accuracy} = \frac{\sum_{i=1}^{C} TP_i}{N} \quad (\text{Với } N \text{ là tổng số mẫu})
     \]

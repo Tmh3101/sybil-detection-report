@@ -2,7 +2,7 @@
 
 \indent\indent Đối mặt với đặc thù mất cân bằng nghiêm trọng của dữ liệu mạng xã hội phi tập trung, việc tối ưu hóa bằng hàm mất mát tiêu chuẩn sẽ khiến mạng GNN có xu hướng thiên vị lớp đa số để đạt \textit{Accuracy} cao. Để giải quyết triệt để vấn đề này, hệ thống áp dụng kỹ thuật Học nhạy cảm với chi phí (\textit{Cost-sensitive Learning}) \cite{he2009learning} bằng cách tích hợp trọng số lớp (\textit{Class Weights}) trực tiếp vào hàm mất mát \textit{Cross-Entropy}.\vspace{0.3cm}
 
-Trọng số $\alpha_c$ cho từng lớp $c$ được tính toán dựa trên tần suất xuất hiện của lớp đó trong tập huấn luyện theo công thức cân bằng được chuẩn hóa rộng rãi trong các hệ thống học máy \cite{pedregosa2011scikit}:
+Trọng số $\alpha_c$ cho từng lớp $c$ được tính toán dựa trên tần suất xuất hiện của lớp đó trong tập huấn luyện theo công thức cân bằng:
 \[
     \alpha_c = \frac{N}{C \times N_c}
 \]

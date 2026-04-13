@@ -30,7 +30,7 @@ Kết quả định lượng của quá trình tinh lọc này trên ba phạm v
 \begin{figure}[H]
     \centering
     \includegraphics[width=\linewidth]{images/part-02/chap-02/sec-02/NodeFilteringStats.png}
-    \caption{Thống kê số lượng Profile ban đầu và sau khi lọc nút cô lập}
+    \caption{Thống kê số lượng tài khoản ban đầu và sau khi lọc nút cô lập}
     \label{fig:NodeFilteringStats}
 \end{figure}
 
@@ -40,9 +40,7 @@ Kết quả định lượng của quá trình tinh lọc này trên ba phạm v
 
 Sau bước tiền lọc các nút cô lập, tập dữ liệu thu được mang những đặc tính đa tầng, phản ánh các khía cạnh hành vi khác nhau trong không gian mạng xã hội phi tập trung. Phần này thực hiện phân tích về quy mô quan hệ và chất lượng thuộc tính nút nhằm thiết lập nền tảng cho việc xây dựng các đặc trưng huấn luyện mô hình.\vspace{0.3cm}
 
-\textbf{a. Quy mô quan hệ đa tầng}\vspace{0.2cm}
-
-Mạng lưới hành vi trong hệ thống \textbf{SybilSignal} được đặc tả qua bốn tầng quan hệ chính: Theo dõi, Tương tác, Tương đồng và Đồng sở hữu. Kết quả thống kê số lượng cạnh sau khi đã thực hiện tạo cạnh đối xứng cho các quan hệ có hướng được trình bày tại \textbf{Hình \ref{fig:MultiLayerEdges}}.
+Kết quả thống kê số lượng cạnh sau khi đã thực hiện tạo cạnh đối xứng cho các quan hệ có hướng được trình bày tại \textbf{Hình \ref{fig:MultiLayerEdges}}.
 
 \begin{figure}[H]
     \centering
@@ -52,8 +50,6 @@ Mạng lưới hành vi trong hệ thống \textbf{SybilSignal} được đặc 
 \end{figure}
 
 Dữ liệu cho thấy sự tăng trưởng quy mô cạnh theo cấp số nhân khi mở rộng phạm vi nghiên cứu. Đặc biệt, tầng \textit{Đồng sở hữu} thể hiện sự bùng nổ về số lượng cạnh tại phạm vi Quý với $103,454$ liên kết, cao gấp hơn 500 lần so với phạm vi Tuần ($200$ cạnh). Điều này minh chứng cho sự tồn tại của các cụm Sybil có mối liên kết chặt chẽ về tính sở hữu, vốn là một trong những tín hiệu quan trọng nhất để nhận diện mạng lưới Sybil chuyên nghiệp hoạt động dài hạn.\vspace{0.3cm}
-
-\textbf{b. Chất lượng và đặc trưng thuộc tính văn bản}\vspace{0.2cm}
 
 Chất lượng dữ liệu định danh đóng vai trò quyết định đến hiệu quả của quá trình nhúng ngữ nghĩa (\textit{Node Embedding}). Đề tài thực hiện đánh giá hai chỉ số then chốt: Tỷ lệ lấp đầy và Độ dài văn bản trung bình trên ba trường dữ liệu: \texttt{handle}, \texttt{display\_name} và \texttt{bio}.
 

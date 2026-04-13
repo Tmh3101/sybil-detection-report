@@ -1,9 +1,15 @@
 \subsection{1. Kết quả đạt được}
 
 \begin{itemize}[label={--}, itemsep=1pt]
-    \item \textbf{Xây dựng thành công kiến trúc đồ thị nhận thức ràng buộc:} Đề tài đã đề xuất và cài đặt hoàn chỉnh hệ thống phát hiện Sybil thông qua việc mô hình hóa dữ liệu Web3 thành đồ thị đa quan hệ với 4 tầng phân biệt (Follow, Interact, Similarity, Co-Owner). Việc áp dụng cơ chế chuẩn hóa trọng số logarit giúp mô hình giải quyết hiệu quả bài toán nhiễu và bùng nổ thông điệp tại các nút siêu đặc trên đồ thị mạng xã hội phi tập trung.
+    \item \textbf{Xây dựng thành công kiến trúc đồ thị nhận thức ràng buộc:} Đề tài đã đề xuất và cài đặt hoàn chỉnh hệ thống phát hiện Sybil thông qua việc mô hình hóa dữ liệu Web3 thành đồ thị đa quan hệ với 4 tầng phân biệt (Follow, Interact, Similarity, Co-Owner). Việc áp dụng cơ chế chuẩn hóa trọng số logarit giúp giải quyết hiệu quả bài toán nhiễu cấu trúc và bùng nổ thông điệp tại các nút siêu đặc trên mạng xã hội phi tập trung.
     
-    \item \textbf{Tối ưu hóa kiến trúc và đột phá về kết quả phân lớp:} Kết quả thực nghiệm chứng minh kiến trúc phân lớp tách rời (\textit{Decoupled GNN-ML}) mang lại hiệu năng vượt trội. Tổ hợp giữa GATv2 (đóng vai trò trích xuất đặc trưng) và Random Forest (bộ phân lớp) đã đạt chỉ số Macro F1-Score lên tới 0.9303 trên tập dữ liệu khó nhất (phạm vi Quý). Đặc biệt, mô hình đạt tỷ lệ nhận diện nhầm 0\% đối với nhóm người dùng thật (\textit{Benign}), bảo vệ tuyệt đối trải nghiệm của người dùng chân chính trong khi vẫn tóm gọn hiệu quả các mạng lưới Sybil lớn.
+    \item \textbf{Tối ưu hóa kiến trúc và đột phá về kết quả phân lớp:} Khẳng định tính ưu việt của kiến trúc phân lớp tách rời (\textit{Decoupled GNN-ML}). Tổ hợp giữa GATv2 (đóng vai trò trích xuất đặc trưng) và Random Forest (bộ phân lớp) đã đạt chỉ số Macro F1-Score lên tới 0.9303 trên tập dữ liệu Quý. Đặc biệt, mô hình ghi nhận tỷ lệ nhận diện nhầm 0\% đối với nhóm người dùng thật (\textit{Benign}) trên tập thử nghiệm, đảm bảo an toàn tối đa cho người dùng chân chính trong khi vẫn bóc tách hiệu quả các mạng lưới Sybil quy mô lớn.
     
-    \item \textbf{Giải quyết bài toán thiếu hụt nhãn:} Đề tài đã thiết kế thành công pipeline 3 giai đoạn, tự động hóa hoàn toàn quy trình gán nhãn dữ liệu bằng học không giám sát với GAE kết hợp hệ luật suy diễn.
+    \item \textbf{Giải quyết bài toán thiếu hụt nhãn thực tế:} Đề tài đã thiết kế thành công pipeline tự động hóa quy trình gán nhãn thông qua phương pháp giám sát yếu (\textit{weak supervision}). Việc kết hợp trích xuất đặc trưng ẩn GAE và hệ thống luật hiệu chuẩn đã tạo ra bộ dữ liệu huấn luyện có độ tin cậy cao, giải quyết triệt để rào cản khởi động lạnh trong dự án Web3.
+    
+    \item \textbf{Phát triển phần mềm ứng dụng thực tiễn:} Không dừng lại ở mức mô hình lý thuyết, đề tài đã đóng gói thành một hệ thống quản trị hoàn chỉnh với hai tính năng trọng tâm:
+    \begin{enumerate}
+        \item[(1)] \textit{Xác minh thực thể:} Cho phép truy vấn trực tiếp bằng định danh (\textit{Profile ID}) để trả về nhãn rủi ro dự đoán. Đặc biệt, tính năng này cung cấp năng lực giải thích trực quan bằng cách trích xuất và hiển thị đồ thị láng giềng cục bộ của nút mục tiêu dựa trên đồ thị tham chiếu gốc, giúp hiểu được nguyên nhân phân loại.
+        \item[(2)] \textit{Khám phá mạng lưới:} Cho phép thực thi tự động toàn bộ pipeline phân tích trên các luồng dữ liệu mới. Phân hệ này xuất ra kết quả trực quan hóa cấu trúc của các cụm Sybil kèm theo lý do gán nhãn chi tiết.
+    \end{enumerate}
 \end{itemize}

@@ -1,7 +1,9 @@
 \subsection{2. Hướng phát triển}
 
 \begin{itemize}[label={--}, itemsep=1pt]
-    \item \textbf{Mở rộng mô hình hóa đồ thị thời gian:} Bổ sung thêm chiều thời gian vào cấu trúc đồ thị hiện tại để theo dõi sự tiến hóa của mạng lưới. Thay vì chỉ phân tích một bức tranh tĩnh, mạng nơ-ron đồ thị không gian-thời gian (Spatio-Temporal GNNs) sẽ giúp hệ thống nắm bắt được trình tự chuỗi hành vi, từ đó phát hiện sớm các chiến dịch tấn công Sybil ngay từ giai đoạn chúng mới bắt đầu hình thành cấu trúc kết nối.
+    \item \textbf{Cơ chế học tăng cường:} Trong môi trường Web3, các tổ chức tạo Sybil liên tục thay đổi. Việc ứng dụng Học tăng cường sẽ giúp hệ thống có khả năng tự động học giá trị phần thưởng từ các phản hồi của chuyên gia, từ đó tự tinh chỉnh lại mô hình để đối phó với các mô thức tấn công mới mà không cần huấn luyện lại từ đầu.
     
-    \item \textbf{Nâng cao tính diễn giải của mô hình:} Tích hợp các thuật toán giải thích đồ thị chuyên sâu (như GNNExplainer hay SubgraphX) trực tiếp vào giao diện của hệ thống. Hướng phát triển này sẽ giúp chỉ ra một cách tường minh các "cạnh" (hành vi tương tác) hoặc các "nút" (tài khoản trung gian) nào có trọng lượng quyết định lớn nhất dẫn đến việc hệ thống gán nhãn Sybil. Điều này không chỉ tăng độ tin cậy cho hệ thống mà còn hỗ trợ quản trị viên dễ dàng rà soát và cung cấp bằng chứng on-chain minh bạch cho cộng đồng.
+    \item \textbf{Mở rộng mô hình hóa đồ thị không gian - thời gian:} Bổ sung chiều thời gian vào cấu trúc đồ thị hiện tại để theo dõi sự tiến hóa của mạng lưới. Mạng nơ-ron đồ thị thời gian sẽ giúp hệ thống nắm bắt được trình tự động học của chuỗi hành vi, từ đó phát hiện sớm các chiến dịch tấn công Sybil ngay từ giai đoạn chúng mới bắt đầu hình thành liên kết thay vì chờ cấu trúc kịch bản hoàn thiện.
+    
+    \item \textbf{Khung giải thích đa tầng:} Nâng cấp tính minh bạch của toàn bộ pipeline bằng cách kết hợp sức mạnh của hai trường phái giải thích. Cụ thể, sử dụng \textbf{SHAP (SHapley Additive exPlanations)} bao bọc bộ phân lớp Random Forest ở giai đoạn cuối để chỉ ra mức độ đóng góp của từng đặc trưng ẩn. Sự kết hợp này sẽ cung cấp bằng chứng suy luận toàn diện và thuyết phục.
 \end{itemize}
