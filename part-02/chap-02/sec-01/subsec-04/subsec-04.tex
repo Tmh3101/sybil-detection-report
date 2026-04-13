@@ -5,15 +5,15 @@ Kiến trúc tổng quát của các mô hình GNN baseline được minh họa 
 
 \begin{figure}[H]
     \centering
-    \includegraphics[width=0.55\linewidth]{images/part-02/chap-02/sec-01/GNNArchitecture.png}
+    \includegraphics[width=0.5\linewidth]{images/part-02/chap-02/sec-01/GNNArchitecture.png}
     \vspace{0.2cm}
     \caption{Kiến trúc tổng quan của các mô hình GNN Baseline}
     \label{fig:GNNArchitecture}
 \end{figure}
 
-\textit{1.4.1. Đặc tả dữ liệu đầu vào và đầu ra}
+\textit{1.4.1. Đặc tả dữ liệu đầu vào và đầu ra}\vspace{0.2cm}
 
-\begin{itemize}[label={--}, itemsep=3pt]
+\begin{itemize}[label={--}, itemsep=1pt]
     \item \textbf{Đầu vào:} Dữ liệu đồ thị bao gồm ma trận đặc trưng nút $X$ ($396$ chiều) và các thuộc tính cạnh đại diện cho trọng số hành vi $w_{ij}$.
     \item \textbf{Đầu ra:} Kết quả dự đoán xác suất cho 4 lớp đối tượng: \texttt{BENIGN}, \texttt{LOW\_RISK}, \texttt{HIGH\_RISK} và \texttt{MALICIOUS}.
 \end{itemize}
@@ -22,9 +22,9 @@ Kiến trúc tổng quát của các mô hình GNN baseline được minh họa 
 
 \indent Quy trình xử lý của các mô hình baseline được chia thành hai giai đoạn chính nhằm tối ưu hóa việc trích xuất tín hiệu từ đồ thị thưa thớt:
 
-\begin{itemize}[label={--}, itemsep=3pt]
+\begin{itemize}[label={--}, itemsep=1pt]
     \item \textbf{Giai đoạn trích xuất đặc trưng:} Hệ thống sử dụng cấu trúc hai tầng tích chập đồ thị (\textit{Message Passing}) để khai thác thông tin cấu trúc:
-    \begin{itemize}[label={+}, itemsep=2pt]
+    \begin{itemize}[label={+}, itemsep=1pt]
         \item \textbf{Tầng mở rộng (Layer 1):} Chuyển đổi từ 396 đặc trưng thô sang không gian ẩn trung gian (32 đơn vị × số đầu chú ý). Tại đây, hàm kích hoạt ELU và Dropout (0.1) được áp dụng để ổn định tín hiệu và chống quá khớp.
         \item \textbf{Tầng nén đặc trưng (Layer 2):} Toàn bộ các mô hình đều được ép về một không gian 16 chiều. Vector này đóng vai trò là thông tin tổng hợp tinh túy nhất về hành vi của một nút.
     \end{itemize}
@@ -34,7 +34,7 @@ Kiến trúc tổng quát của các mô hình GNN baseline được minh họa 
 \textit{1.4.3. Đặc thù cấu hình các biến thể kiến trúc}\vspace{0.2cm}
 
 \indent Mặc dù cùng tuân thủ khung kiến trúc chuẩn, mỗi biến thể GNN được tùy chỉnh cơ chế truyền tin để xử lý trọng số cạnh $w_{ij}$ theo các phương pháp đặc thù:
-\begin{itemize}[label={--}, itemsep=3pt]
+\begin{itemize}[label={--}, itemsep=1pt]
     \item \textbf{GATv2 \& Transformer:} Sử dụng cơ chế chú ý động với 4 đầu chú ý độc lập, tích hợp $w_{ij}$ trực tiếp vào quá trình tính điểm chú ý.
     \item \textbf{GCN:} Tiếp nhận $w_{ij}$ dưới dạng \texttt{edge\_weight} để điều chỉnh cường độ lan truyền tin nhắn một cách trực tiếp dựa trên cấu trúc đồ thị.
     \item \textbf{GINE:} Sử dụng mạng nơ-ron đa tầng nội tại để nhúng trọng số cạnh vào thông điệp của láng giềng trước khi thực hiện phép cộng.

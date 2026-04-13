@@ -1,8 +1,8 @@
 \chapter{PHỤ LỤC A. KẾT QUẢ KIỂM THỬ VỚI CÁC KIẾN TRÚC DECOUPLED GNN-ML}
 
-\indent\indent Phụ lục này trình bày toàn bộ kết quả thực nghiệm của 20 tổ hợp kiến trúc phân lớp tách rời (Decoupled GNN-ML). Không gian thực nghiệm bao gồm 05 backbone Graph Neural Network (GAT, GCN, GINE, PNA, Transformer) kết hợp với 04 mô hình học máy truyền thống (KNN, Linear SVC, Random Forest, XGBoost) trên ba phạm vi thời gian: Tuần, Tháng và Quý.\vspace{.3cm}
+\indent\indent Phụ lục này trình bày toàn bộ kết quả thực nghiệm của 20 tổ hợp kiến trúc phân lớp tách rời (Decoupled GNN-ML). Không gian thực nghiệm bao gồm 05 GNN backbone (GAT, GCN, GINE, PNA, Transformer) kết hợp với 04 mô hình học máy truyền thống (KNN, Linear SVC, Random Forest, XGBoost) trên ba phạm vi thời gian: Tuần, Tháng và Quý.\vspace{.3cm}
 
-Các giá trị được báo cáo là trung bình kèm theo độ lệch chuẩn ($\pm$ std) sau 05 lượt chạy độc lập. Độ lệch chuẩn được ghi nhận bằng $.0000$ đối với KNN, Linear SVC và XGBoost do tính chất tất định (\textit{deterministic}) của các thuật toán này trên cùng một phân vùng dữ liệu. Riêng Random Forest có độ biến thiên nội tại do cơ chế lấy mẫu ngẫu nhiên (\textit{bootstrap sampling}).
+Các giá trị được báo cáo là trung bình kèm theo độ lệch chuẩn sau 05 lượt chạy độc lập. Độ lệch chuẩn được ghi nhận bằng $0$ đối với KNN, Linear SVC và XGBoost do tính chất tất định của các thuật toán này trên cùng một phân vùng dữ liệu. Riêng Random Forest có độ biến thiên nội tại do cơ chế lấy mẫu ngẫu nhiên.
 
 \newpage
 % LƯU Ý: Đảm bảo bạn đã khai báo thư viện \usepackage{pdflscape} và \usepackage{booktabs} ở đầu file main.tex
@@ -105,7 +105,7 @@ Các giá trị được báo cáo là trung bình kèm theo độ lệch chuẩ
 
 
 %================================================
-\chapter{PHỤ LỤC B. SYBILSIGNAL - ỨNG DỤNG THỰC TIỄN}
+\chapter{PHỤ LỤC B. ỨNG DỤNG SYBILSIGNAL}
 
 \indent\indent Để minh chứng cho năng lực thực thi của mô hình, toàn bộ quy trình nhận diện và giải thích đồ thị láng giềng đã được đóng gói thành hệ thống quản trị dạng Web Dashboard. Có thể trải nghiệm trực tiếp thông qua các thông tin dưới đây:
 

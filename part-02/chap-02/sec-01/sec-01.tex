@@ -1,10 +1,10 @@
 \subsection{1. Thiết kế hệ thống}
 
-\indent\indent Quy trình tổng quát của hệ thống SybilSignal được thiết kế nhằm giải quyết bài toán phát hiện tài khoản giả mạo thông qua hai phân hệ chính hoạt động bổ trợ lẫn nhau: \textbf{Phân hệ học biểu diễn và gán nhãn} chịu trách nhiệm kiến tạo dữ liệu và gán nhãn tự động; và \textbf{Phân hệ đánh giá rủi ro} thực hiện nhiệm vụ dự đoán và diễn giải kết quả theo thời gian thực.\vspace{0.4cm}
+\indent\indent Quy trình tổng quát của hệ thống SybilSignal được thiết kế nhằm giải quyết bài toán phát hiện tài khoản giả mạo thông qua hai phân hệ chính hoạt động bổ trợ lẫn nhau: \textbf{Phân hệ học biểu diễn và gán nhãn} chịu trách nhiệm kiến tạo dữ liệu và gán nhãn tự động; và \textbf{Phân hệ đánh giá rủi ro} thực hiện nhiệm vụ dự đoán và diễn giải kết quả theo thời gian thực.\vspace{0.3cm}
     
-\textbf{Luồng dữ liệu Phân hệ học biểu diễn và gán nhãn:}\vspace{0.2cm}
+\textit{1.1. Luồng dữ liệu Phân hệ học biểu diễn và gán nhãn}\vspace{0.3cm}
 
-Quy trình của phân hệ này được minh họa tại \textbf{Hình \ref{fig:GAEPipeline}}, tập trung vào việc học biểu diễn không gian tiềm ẩn, tự động hóa khâu gán nhãn nhằm giải quyết sự thiếu hụt dữ liệu huấn luyện.
+Quy trình của phân hệ này được minh họa tại \textbf{Hình \ref{fig:DataPipeline}}, tập trung vào việc học biểu diễn không gian tiềm ẩn, tự động hóa khâu gán nhãn nhằm giải quyết sự thiếu hụt dữ liệu huấn luyện.
 
 \begin{figure}[H]
     \centering
@@ -20,18 +20,14 @@ Quy trình của phân hệ này được minh họa tại \textbf{Hình \ref{fi
     \item \textbf{Đầu ra:} Một \textit{tập dữ liệu đồ thị có nhãn}, sẵn sàng làm nguyên liệu để huấn luyện các mô hình phân lớp.
 \end{itemize}\vspace{0.2cm}
 
-\textbf{Chi tiết các giai đoạn xử lý:}
-\begin{itemize}[label={--}, itemsep=3pt]
-    \item \textbf{Giai đoạn 1 -- Thu thập và xử lý dữ liệu:} Hệ thống truy xuất dữ liệu thô từ Lens Protocol, sau đó tiến hành xử lý song song hai luồng thông tin: trích xuất đặc trưng ngữ nghĩa từ văn bản và tính toán các chỉ số thống kê hoạt động. Kết quả của giai đoạn này là mỗi tài khoản được biểu diễn một cách toàn diện thông qua một vector đặc trưng nút có kích thước $396$ chiều.
-    
-    \item \textbf{Giai đoạn 2 -- Xây dựng đồ thị đa tầng:} Dựa trên dữ liệu tương tác thu thập được, hệ thống kiến tạo cấu trúc đồ thị nhận thức ràng buộc với 4 tầng quan hệ. Trọng số của các cạnh trong mạng lưới được chuẩn hóa theo hàm Logarit nhằm cân bằng tín hiệu thông tin, ngăn chặn sự thống trị của các tài khoản có mật độ kết nối siêu đặc.
-    
-    \item \textbf{Giai đoạn 3 -- Học biểu diễn:} Đồ thị hoàn chỉnh được đưa vào kiến trúc mạng tự mã hóa đồ thị (Graph Autoencoder - GAE) với bộ mã hóa là GATv2. Mục tiêu của giai đoạn này là nén cấu trúc liên kết đa chiều và đặc trưng nút thành các vector trong không gian tiềm ẩn, giúp hệ thống tự động bóc tách các cấu trúc của các nhóm Sybil mà không cần đến dữ liệu gán nhãn từ trước.
-    
-    \item \textbf{Giai đoạn 4 -- Chấm điểm rủi ro và gán nhãn:} Dựa trên các vector biểu diễn, thuật toán K-Means thực hiện gom cụm các tài khoản có độ tương đồng cao về hành vi. Cuối cùng, hệ thống áp dụng cơ chế chấm điểm rủi ro dựa trên hệ luật suy diễn để tự động phân bổ nhãn giả lập (Pseudo-labeling) cho các cụm. Kết quả đầu ra là một tập dữ liệu đồ thị có nhãn chất lượng cao, sẵn sàng phục vụ cho việc huấn luyện có giám sát.
-\end{itemize}\vspace{0.2cm}
+Kiến trúc tại được thiết kế nhằm tối ưu hóa sự luân chuyển thông tin qua 04 phân vùng chức năng cốt lõi:
+\begin{itemize}[label={--}, itemsep=1pt]
+    \item \textbf{Luồng tích hợp đa nguồn:} Dữ liệu từ Lens Protocol được xử lý song song để tạo ra vector đặc trưng nút $396$ chiều. Thiết kế này đảm bảo sự hội tụ giữa ngữ nghĩa văn bản và hành vi định lượng trước khi bước vào không gian đồ thị.
+    \item \textbf{Luồng nén và trích xuất đặc trưng:} Kế thừa cơ chế Encoder-Decoder của GAE tại Chương 1, đồ thị đa tầng được đưa qua mạng GATv2 để nén cấu trúc. Quá trình này giúp lọc nhiễu và trích xuất các đặc trưng cấu trúc (structural features) cô đọng nhất dưới dạng các vector tiềm ẩn.
+    \item \textbf{Luồng gán nhãn giả lập:} Dựa trên các vector đã nén, hệ thống thực hiện phân tách không gian bằng K-Means. Điểm nhấn trong thiết kế này là sự kết hợp với hệ luật chuyên gia để ánh xạ điểm rủi ro thành nhãn, hoàn tất quy trình tự động hóa khâu chuẩn bị dữ liệu giám sát mà không cần can thiệp thủ công.
+\end{itemize}
 
-\textbf{Luồng dữ liệu Phân hệ Đánh giá rủi ro:}\vspace{0.2cm}
+\textit{1.2. Luồng dữ liệu Phân hệ Đánh giá rủi ro}\vspace{0.2cm}
 
 Luồng suy diễn trực tuyến dành cho người dùng cuối được minh họa tại \textbf{Hình \ref{fig:PredictionPipeline}}. Phân hệ này được thiết kế ưu tiên về tốc độ phản hồi và cho phép tích hợp linh hoạt các mô hình dự đoán tối ưu nhất.
 
@@ -49,13 +45,11 @@ Luồng suy diễn trực tuyến dành cho người dùng cuối được minh 
     \item \textbf{Đầu ra:} Phán quyết cuối cùng phân loại tài khoản vào một trong bốn nhãn: \texttt{BENIGN}, \texttt{LOW\_RISK}, \texttt{HIGH\_RISK}, hoặc \texttt{MALICIOUS}.
 \end{itemize}\vspace{0.2cm}
 
-\textbf{Chi tiết các giai đoạn xử lý:}
-\begin{itemize}[label={--}, itemsep=3pt]
-    \item \textbf{Giai đoạn 1 -- Định tuyến và truy xuất dữ liệu:} Khi tiếp nhận \texttt{Profile ID}, hệ thống thực hiện cơ chế định tuyến thông minh nhằm tối ưu hiệu năng. Nếu tài khoản đã tồn tại trong đồ thị tham chiếu, hệ thống sẽ truy xuất trực tiếp. Ngược lại, nếu là tài khoản hoàn toàn mới, hệ thống sẽ truy xuất dữ liệu trực tiếp qua API của Lens Protocol để thu thập thông tin đặc trưng nút và các cạnh liên kết của tài khoản này với mạng lưới hiện hữu.
-    
-    \item \textbf{Giai đoạn 2 -- Tái tạo đồ thị cục bộ:} Từ tập dữ liệu vừa truy xuất, hệ thống tiến hành xây dựng mạng lưới lân cận (Ego-network) xoay quanh tài khoản mục tiêu. Quá trình này kiến tạo một đồ thị cục bộ thu nhỏ bao gồm đầy đủ 4 tầng quan hệ, giúp khoanh vùng phạm vi ảnh hưởng và cung cấp bối cảnh cấu trúc mạng lưới cần thiết mà không đòi hỏi tài nguyên để tải toàn bộ đồ thị khổng lồ.
-    
-    \item \textbf{Giai đoạn 3 -- Dự đoán:} Đồ thị cục bộ được đưa vào lõi dự đoán áp dụng kiến trúc học máy tách rời. Đầu tiên, bộ mã hóa GNN nén thông tin đồ thị thành vector đặc trưng tiềm ẩn. Sau đó, mô hình phân lớp sẽ dựa vào vector này để đưa ra nhãn rủi ro cuối cùng.
+Kiến trúc thực thi được tối ưu để xử lý các yêu cầu truy vấn đơn lẻ với độ trễ thấp thông qua ba bước chuyển đổi dữ liệu:
+\begin{itemize}[label={--}, itemsep=1pt]
+    \item \textbf{Cơ chế truy xuất và định tuyến:} Hệ thống ưu tiên truy xuất đồ thị tham chiếu có sẵn để giảm thiểu tài nguyên. Đối với tài khoản mới, luồng dữ liệu được định tuyến qua API Lens Protocol để thu thập thông tin "tức thời" (on-the-fly).
+    \item \textbf{Thiết kế đồ thị cục bộ:} Thay vì xử lý toàn bộ đồ thị khổng lồ, hệ thống chỉ tái tạo mạng lưới lân cận của \texttt{Profile ID} mục tiêu. Thiết kế này giúp khoanh vùng bối cảnh cấu trúc mạng cần thiết, đảm bảo tính giải thích dựa trên các nút láng giềng.
+    \item \textbf{Thực thi dự đoán tách rời:} Luồng dữ liệu cuối cùng được đưa qua lõi dự đoán đã được huấn luyện sẵn. Vector tiềm ẩn từ bộ mã hóa GNN sẽ được đưa vào mô hình phân lớp để xuất ra phán quyết rủi ro cuối cùng theo thời gian thực.
 \end{itemize}
 
 \input{part-02/chap-02/sec-01/subsec-01/subsec-01}

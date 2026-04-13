@@ -34,8 +34,7 @@ Nhằm đánh giá năng lực của các kiến trúc, nghiên cứu tiến hà
     \label{fig:F1Trend}
 \end{figure}
 
-
-Kết quả thực nghiệm chỉ ra một xu hướng tỷ lệ nghịch giữa quy mô đồ thị và hiệu năng mô hình. Ở phạm vi Tuần, cấu trúc của cụm Sybil chưa được rõ ràng, cho phép GCN đạt hiệu năng tuyệt đối. Tuy nhiên, khi mật độ liên kết tăng vọt ở phạm vi Quý, GATv2 và Transformer bộc lộ ưu thế vượt trội nhờ cơ chế chú ý giúp lọc nhiễu thông tin láng giềng hiệu quả hơn các cơ chế tổng hợp tĩnh.\vspace{0.3cm}
+Kết quả thực nghiệm chỉ ra một xu hướng tỷ lệ nghịch giữa quy mô đồ thị và hiệu năng mô hình. Tại phạm vi Tuần, do quy mô dữ liệu còn nhỏ (với tập kiểm thử chỉ gồm 30 mẫu) và các đặc trưng hành vi của Sybil chưa mang tính liên kết phức tạp, các mô hình cơ bản như GCN có thể dễ dàng phân tách các nhóm đối tượng, dẫn đến hiệu năng tuyệt đối ($F1 = 1.000$). Tuy nhiên, kết quả này mang tính chất tham khảo do kích thước mẫu hạn chế và có thể chưa phản ánh đầy đủ độ phức tạp thực tế. Khi mật độ liên kết tăng vọt ở phạm vi Quý, các biến thể Sybil trở nên tinh vi hơn, lúc này GATv2 và Transformer mới bộc lộ ưu thế vượt trội nhờ cơ chế chú ý giúp lọc nhiễu thông tin láng giềng hiệu quả hơn các cơ chế tổng hợp tĩnh.\vspace{0.3cm}
 
 \indent Tập dữ liệu Quý, với độ phức tạp cao nhất, được lựa chọn để phân tích sâu về khả năng hội tụ và tính ổn định. \textbf{Bảng \ref{tab:QuarterDetail}} trình bày chi tiết các chỉ số thống kê.
 
@@ -95,7 +94,7 @@ Từ \textbf{Hình \ref{fig:DecoupledHeatmap}}, có thể rút ra những phân 
 
 \begin{itemize}[label={--}, itemsep=1pt]
     \item \textbf{Sự thống trị của GATv2 Backbone:} Điều này một lần nữa khẳng định cơ chế chú ý của GATv2, thông qua cấu trúc mạng 02 tầng ($396 \rightarrow 32 \rightarrow 16$), đã nén thông tin ban đầu xuống 16 chiều một cách xuất sắc. Quá trình giảm chiều diễn ra trơn tru qua tầng ẩn 32 chiều giúp mô hình tránh được hiện tượng thắt cổ chai thông tin, giữ lại được những ranh giới phân tách rõ ràng nhất giữa Sybil và tài khoản thật.
-    \item \textbf{Khả năng tương thích của Random Forest và KNN:} Nhìn theo trục ngang, các thuật toán phi tuyến tính (Random Forest) và dựa trên khoảng cách (KNN) hoạt động cực kỳ hiệu quả. Tổ hợp \textbf{GATv2 + Random Forest} vẫn cho thấy tối ưu nhất toàn dải (trung bình \textit{Macro F1} đạt 0.9303 và \textit{Accuracy} đạt 0.9436).
+    \item \textbf{Khả năng tương thích của Random Forest và KNN:} Nhìn theo trục ngang, các thuật toán phi tuyến tính (Random Forest) và dựa trên khoảng cách (KNN) hoạt động cực kỳ hiệu quả. Tổ hợp \textbf{GATv2 + Random Forest} cho thấy sự tối ưu vượt trội trên mọi phạm vi, đặc biệt duy trì \textit{Macro F1} ở mức 0.8833 tại phạm vi Quý (trung bình cộng không trọng số qua ba phạm vi đạt 0.9303 và \textit{Accuracy} đạt 0.9436).
     \item \textbf{Sự sụt giảm của LinearSVC:} Mô hình phân loại tuyến tính (LinearSVC) nhìn chung cho kết quả thấp nhất (đặc biệt khi kết hợp với GINE, F1 chỉ đạt 0.7764). Điều này chứng minh rằng các cụm hành vi Sybil trong không gian ẩn không phân bố tuyến tính, đòi hỏi các ranh giới quyết định phức tạp hơn.
 \end{itemize}
 

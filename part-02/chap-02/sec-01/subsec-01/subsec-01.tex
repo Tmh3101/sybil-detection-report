@@ -5,39 +5,56 @@
 \indent Sơ đồ luồng xử lý thu thập và kiến tạo đồ thị được minh họa tại \textbf{Hình \ref{fig:GraphBuilder}}, bao gồm hai nhánh xử lý song song và cơ chế hoạt động như sau:
 \begin{figure}[H]
     \centering
-    % Hãy đổi tên file ảnh dưới đây cho khớp với tên file ảnh của bạn trong thư mục Overleaf
     \includegraphics[width=\linewidth]{images/part-02/chap-02/sec-01/BuildMLG.png}
-    \vspace{0.3cm}
+    \vspace{0.1cm}
     \caption{Sơ đồ luồng quy trình xây dựng dữ liệu đồ thị đa tầng}
     \label{fig:GraphBuilder}
 \end{figure}
 
-\textbf{Đầu vào:} Dữ liệu thô từ mạng lưới Lens Protocol được truy xuất hàng loạt thông qua BigQuery trong một khoảng thời gian xác định, bao gồm thông tin hồ sơ, thống kê hoạt động và các bản ghi sự kiện tương tác.\vspace{0.3cm}
+\textbf{Đầu vào:} Dữ liệu thô từ mạng lưới Lens Protocol được truy xuất hàng loạt thông qua BigQuery, bao gồm thông tin hồ sơ, thống kê hoạt động và các bản ghi sự kiện tương tác.\vspace{0.3cm}
 
-\textbf{Đầu ra:} Một đồ thị đa quan hệ hoàn chỉnh, được đóng gói dưới dạng đối tượng \texttt{Data} của thư viện PyTorch Geometric, sẵn sàng làm đầu vào cho các mạng GNN.\vspace{0.3cm}
+\textbf{Đầu ra:} Một đồ thị đa quan hệ hoàn chỉnh, được đóng gói dưới dạng đối tượng \texttt{Data} của thư viện PyTorch Geometric.\vspace{0.3cm}
 
 \textbf{Quy trình xử lý:}\vspace{-0.1cm}
 \begin{itemize}[label={--}, itemsep=3pt]
     \item \textbf{Thu thập và xử lý dữ liệu nút:} Dữ liệu mô tả tài khoản được chia làm hai nhánh trích xuất đặc trưng độc lập trước khi tiến hành hợp nhất:
     \begin{itemize}[label={+}, itemsep=3pt]
-        \item \textit{Đặc trưng ngữ nghĩa (Văn bản):} Trích xuất thông tin từ hồ sơ bao gồm Handle, Display Name và Bio. Các trường văn bản này được nhúng qua mô hình \texttt{all-MiniLM-L6-v2} để tạo vector embedding có kích thước 384 chiều.
-        \item \textit{Đặc trưng định lượng (12 chiều):} Hệ thống trích xuất 12 biến số liên tục phản ánh độ uy tín và mức độ hoạt động của tài khoản, bao gồm hai nhóm chính:
-        \begin{itemize}[label={$\circ$}, itemsep=1pt]
-            \item \textbf{11 chỉ số định lượng:} Gồm điểm tin cậy (\texttt{trust\_score}) và 10 chỉ số đo lường quy mô tương tác (tổng số lượt \textit{tips, posts, quotes, reacted, reactions, reposts, collects, comments, followers} và \textit{following}).
-            \item \textbf{1 chỉ số thời gian:} Số ngày hoạt động (\texttt{days\_active}), được tính toán dựa trên độ lệch giữa thời điểm tạo tài khoản và thời gian hệ thống hiện tại.
-        \end{itemize}
-        \indent Để tránh hiện tượng các giá trị có biên độ quá lớn áp đảo quá trình học của mạng nơ-ron, toàn bộ 12 đặc trưng này được đưa qua bộ chuẩn hóa \textit{StandardScaler} để đưa về cùng một phân phối chuẩn (với giá trị trung bình bằng $0$ và độ lệch chuẩn bằng $1$), tạo thành vector định lượng 12 chiều hoàn chỉnh.
-        \item \textit{Hợp nhất:} Hai vector trên được ghép nối lại với nhau, tạo thành một vector đặc trưng nút toàn diện với kích thước 396 chiều ($384 + 12 = 396$).
+        \item \textit{Đặc trưng ngữ nghĩa (Văn bản):} Nhúng qua mô hình \texttt{all-MiniLM-L6-v2} tạo vector 384 chiều.
+        \item \textit{Đặc trưng định lượng (12 chiều):} Gồm 11 chỉ số tương tác và 01 chỉ số thời gian hoạt động, được chuẩn hóa qua \textit{StandardScaler}.
+        \item \textit{Hợp nhất:} Tạo thành vector đặc trưng nút toàn diện với kích thước 396 chiều.
     \end{itemize}
 
-    \item \textbf{Thu thập và xử lý dữ liệu quan hệ:} Dữ liệu liên kết giữa các tài khoản được trích xuất và biến đổi qua ba bước tuần tự để hình thành cấu trúc đa tầng của đồ thị:
+    \item \textbf{Thu thập và xử lý dữ liệu quan hệ:} Kế thừa lý thuyết về Đồ thị đa quan hệ nhận thức ràng buộc (CMG) đã được định nghĩa tại Mục 2.2 (Chương 1). Để tối ưu hóa không gian biểu diễn và khắc phục vấn đề phân mảnh dữ liệu, toàn bộ 14 loại quan hệ tương tác gốc từ dữ liệu chuỗi khối được hệ thống phân tích, ánh xạ và hợp nhất về mặt ngữ nghĩa thành 04 tầng đồ thị chính. Bảng \ref{tab:edge_mapping} trình bày chi tiết quy trình gom nhóm này:
+
+    \begin{table}[H]
+        \centering
+        \caption{Bảng ánh xạ 14 loại quan hệ gốc thành 4 tầng đồ thị ngữ nghĩa}
+        \label{tab:edge_mapping}
+        \renewcommand{\arraystretch}{1.3}
+        \setlength{\tabcolsep}{8pt}
+        \begin{tabular}{p{3cm} p{9cm} c}
+            \toprule
+            \textbf{Tầng đồ thị} & \textbf{Các loại quan hệ gốc} & \textbf{Số lượng} \\
+            \midrule
+            \textbf{1. Follow Layer} & \texttt{FOLLOW}, \texttt{FOLLOW\_REV} & 2 \\
+            \midrule
+            \textbf{2. Interact Layer} & \texttt{COMMENT}, \texttt{COMMENT\_REV}, \texttt{QUOTE}, \texttt{QUOTE\_REV}, \texttt{UPVOTE}, \texttt{UPVOTE\_REV}, \texttt{COLLECT}, \texttt{COLLECT\_REV}, \texttt{TIP}, \texttt{TIP\_REV} & 10 \\
+            \midrule
+            \textbf{3. Similarity Layer} & \texttt{SIMILARITY} (Đồ thị vô hướng) & 1 \\
+            \midrule
+            \textbf{4. Co-owner Layer} & \texttt{CO-OWNER} (Đồ thị vô hướng) & 1 \\
+            \midrule
+            \multicolumn{2}{r}{\textbf{Tổng cộng số loại cạnh gốc:}} & \textbf{14} \\
+            \bottomrule
+        \end{tabular}
+    \end{table}
+
+    Mặc dù được phân nhóm dưới góc độ 04 tầng ngữ nghĩa để xây dựng cơ sở lý luận, hệ thống thực tế vẫn bảo toàn nguyên vẹn sự đa dạng của 14 loại quan hệ thông qua chỉ mục phân loại cạnh. Việc giữ độc lập các loại cạnh thay vì gộp chung giúp mạng nơ-ron đồ thị khai thác được đặc trưng vi mô của từng hành vi đơn lẻ. Quá trình xử lý cạnh được tiếp tục qua các bước kỹ thuật:
+
     \begin{itemize}[label={+}, itemsep=1pt]
-        \item \textit{Thu thập và kiến tạo các tầng quan hệ:} Hệ thống xử lý cơ sở dữ liệu gốc để thiết lập 4 nhóm liên kết. Cụ thể: quan hệ \textbf{Theo dõi} và \textbf{Tương tác} được ánh xạ trực tiếp từ dữ liệu sự kiện trên nền tảng; quan hệ \textbf{Tương đồng} được kiến tạo thông qua thuật toán so khớp chéo tuân thủ nguyên tắc \textit{ràng buộc 2/3} (yêu cầu hai nút phải thỏa mãn 2 trong 3 tiêu chí: tương đồng ngữ nghĩa tiểu sử, khoảng cách Levenshtein của tên định danh, và thời gian tạo); cuối cùng, quan hệ \textbf{Đồng sở hữu} được trích xuất bằng cách kết nối các tài khoản có cùng giá trị tại trường \texttt{owned\_by} (địa chỉ ví sở hữu).
-        
-        \item \textit{Sinh cạnh ngược (Reverse Edges):} Đối với các tầng quan hệ có hướng (cụ thể là tầng Theo dõi và Tương tác), hệ thống tiến hành sinh thêm các chiều cạnh ngược tương ứng (ví dụ: \texttt{FOLLOW\_REV}). Cơ chế này đảm bảo thông điệp có thể lan truyền linh hoạt theo cả hai chiều trong quá trình huấn luyện GNN. Riêng dữ liệu liên kết của tầng Tương đồng và Đồng sở hữu vốn mang tính chất đối xứng nên được truyền thẳng qua bước tiếp theo.
-        
-        \item \textit{Gán trọng số cạnh (Edge Weighting):} Sau khi các luồng cạnh gốc và cạnh ngược được hợp nhất, hệ thống tiến hành gán trọng số cơ sở ($W_{base}$) tương ứng cho từng tầng. Cuối cùng, thuật toán áp dụng hàm chuẩn hóa Logarit trên tần suất xuất hiện của hành vi nhằm tinh chỉnh trọng số cuối cùng. Quá trình này giúp đồ thị vừa bảo toàn được sức mạnh của các liên kết mạnh (như quan hệ đồng sở hữu), vừa hạn chế được nhiễu từ các tài khoản siêu đặc.
+        \item \textit{Sinh cạnh ngược:} Đối với các loại quan hệ có hướng (nhóm Theo dõi và Tương tác), hệ thống sinh thêm các chiều cạnh ngược tương ứng (ví dụ: \texttt{FOLLOW\_REV}) để đảm bảo thông điệp lan truyền linh hoạt theo cả hai chiều. Riêng các cạnh \texttt{SIMILARITY} và \texttt{CO-OWNER} vốn mang tính đối xứng nên được giữ nguyên cấu trúc vô hướng.
+        \item \textit{Gán trọng số cạnh:} Với mỗi loại cạnh cụ thể giữa hai thực thể, hệ thống gán trọng số cơ sở ($W_{base}$) và áp dụng hàm chuẩn hóa Logarit trên tần suất xuất hiện của hành vi đó. Cơ chế này giúp kiểm soát cường độ tương tác, hạn chế nhiễu.
     \end{itemize}
     
-    \item \textbf{Đóng gói thành Đồ thị đa tầng:} Các định danh tài khoản được ánh xạ tuần tự, sau đó các ma trận được đóng gói thành đối tượng đồ thị chuẩn. Đặc biệt, để phân biệt các tầng liên kết khác nhau trong quá trình huấn luyện đa quan hệ, hệ thống truyền vào một vector chỉ mục loại cạnh. Đồ thị hoàn chỉnh bao gồm: ma trận đặc trưng nút \texttt{x}, ma trận liên kết \texttt{edge\_index}, vector trọng số \texttt{edge\_attr} và phân loại cạnh \texttt{edge\_type}.
+    \item \textbf{Đóng gói thành Đồ thị đa quan hệ:} Các định danh tài khoản được ánh xạ tuần tự thành các chỉ mục số nguyên. Cuối cùng, toàn bộ dữ liệu được đóng gói thành đối tượng đồ thị chuẩn của thư viện PyTorch Geometric, bao gồm: ma trận đặc trưng nút \texttt{x}, ma trận liên kết \texttt{edge\_index}, vector trọng số \texttt{edge\_attr} và vector chỉ mục phân loại 14 loại cạnh \texttt{edge\_type}.
 \end{itemize}

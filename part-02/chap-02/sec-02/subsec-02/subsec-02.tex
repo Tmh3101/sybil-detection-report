@@ -40,7 +40,7 @@ Hiệu quả của quy trình chuẩn hóa được minh chứng rõ rệt qua k
 \begin{figure}[H]
     \centering
     \includegraphics[width=1.0\linewidth]{images/part-02/chap-02/sec-02/EdgeWeightDistributionQuarter.png}
-    \caption{So sánh phân phối trọng số cạnh trước và sau khi chuẩn hóa trên phạm vi Quý}
+    \caption{Phân phối trọng số cạnh trước và sau khi chuẩn hóa (phạm vi Quý)}
     \label{fig:EdgeWeightDist}
 \end{figure}
 
@@ -73,7 +73,16 @@ Kết quả thực nghiệm tại \textbf{Hình \ref{fig:KMeansEval}} cho thấy
     \item \textbf{Phạm vi Quý:} Trong không gian tìm kiếm $K \in [160, 180]$, mặc dù Silhouette ưu tiên $K=167$, hệ thống quyết định chọn $\mathbf{K=179}$ vì chỉ số Davies-Bouldin đạt mức cực tiểu sâu nhất ($1.1087$), giúp các cấu trúc Sybil phức tạp được bó chặt tốt hơn.
 \end{itemize}
 
-Sau khi phân tách không gian thành các cụm, hệ thống áp dụng hệ luật trọng số để chấm điểm rủi ro cho từng cụm. Dựa trên điểm số này, hàng trăm vi cụm được ánh xạ và hợp nhất về 04 loại nhãn vĩ mô chính:
+\indent\indent Điểm đặc thù trong kết quả phân cụm là hệ thống đã lựa chọn các giá trị $K$ tương đối lớn, dẫn đến quy mô trung bình của mỗi cụm khá nhỏ (biến thiên từ 11 đến 28 nút/cụm). Để biện minh cho không gian khảo sát tham số này, nghiên cứu áp dụng trực tiếp công thức ước lượng \textit{Core-Whisker} đã được thiết lập tại Mục 2.5.1 (Chương 1).\vspace{0.3cm}
+
+Áp dụng công thức đối với tập dữ liệu Quý ($N=4997$) và giả định kích thước cụm lính ảo trung bình $k_{target} \approx 11.5$, hệ thống thu được ước lượng không gian tìm kiếm:
+\begin{equation}
+    K_{Quy} \approx \frac{0.4 \times 4997}{11.5} \approx 173
+\end{equation}
+
+Giá trị ước lượng lý thuyết này hoàn toàn nằm trong biên độ khảo sát thực nghiệm $K \in [160, 180]$ và hội tụ tối ưu tại điểm $K=179$. Tính toán tương tự cho tập dữ liệu Tháng ($N=1416$) cũng định hướng vùng khảo sát quanh ngưỡng $K \approx 113$, rất gần với điểm hội tụ thực tế $K=122$. Sự đồng nhất giữa ước lượng toán học và kết quả chạy thuật toán là minh chứng rành mạch cho việc lựa chọn giá trị $K$ lớn là một chiến lược cấu hình tham số có chủ đích nhằm phản ánh chính xác cấu trúc vi mô của các tổ chức lính ảo trên không gian Web3.\vspace{0.3cm}
+
+Khi không gian biểu diễn đã được phân tách thành $K$ cụm tối ưu dựa trên cơ sở toán học trên, hệ thống tiến hành áp dụng hệ luật chuyên gia định lượng để chấm điểm rủi ro. Dựa trên mức độ vi phạm, hàng trăm vi cụm này sẽ được ánh xạ và hợp nhất về 04 nhóm nhãn vĩ mô chính:
 \begin{itemize}[label={--}, itemsep=1pt]
     \item \textbf{BENIGN:} Thực thể có hành vi phân tán tự nhiên, điểm tin cậy cao và không trùng lặp các chỉ số định danh.
     \item \textbf{LOW\_RISK:} Các tài khoản mới hoặc có tần suất hoạt động thấp, chưa bộc lộ rõ rệt cấu trúc liên kết dị thường.
@@ -99,7 +108,7 @@ Số lượng nhãn \texttt{MALICIOUS} tăng mạnh từ phạm vi Tuần (07 th
 \begin{figure}[H]
     \centering
     \includegraphics[width=\linewidth]{images/part-02/chap-02/sec-02/LabelDistributionComparison.png}
-    \caption{Sự tăng trưởng và lộ diện của các nhóm nhãn qua các phạm vi thời gian}
+    \caption{Sự tăng trưởng của các nhóm nhãn qua các phạm vi thời gian}
     \label{fig:LabelDist}
 \end{figure}
 

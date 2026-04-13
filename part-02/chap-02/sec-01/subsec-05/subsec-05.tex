@@ -4,8 +4,8 @@
 
 \begin{figure}[H]
     \centering
-    \includegraphics[width=0.65\linewidth]{images/part-02/chap-02/sec-01/DecoupledMLArchitecture.png}
-    \vspace{0.2cm}
+    \includegraphics[width=0.5\linewidth]{images/part-02/chap-02/sec-01/DecoupledMLArchitecture.png}
+    \vspace{0.1cm}
     \caption{Sơ đồ luồng xử lý của kiến trúc Decoupled GNN-ML}
     \label{fig:DecoupledML}
 \end{figure}
@@ -14,7 +14,7 @@
 
 \indent Để khắc phục tình trạng hiện tượng các mạng nơ-ron gặp khó khăn trong việc điều chỉnh biên độ đầu ra một cách chính xác do sai lệch về phạm vi dự đoán — nghiên cứu này tận dụng GNN như một bộ trích xuất biểu diễn cấu trúc:
 
-\begin{itemize}[label={--}, itemsep=3pt]
+\begin{itemize}[label={--}, itemsep=1pt]
     \item \textbf{Trích xuất đặc trưng:} Hệ thống thực hiện trích xuất vector từ tầng tích chập thứ hai. Việc này giúp thu thập các biểu diễn đã được tổng hợp thông tin liên kết láng giềng nhưng chưa bị áp đặt bởi các quy tắc quyết định.
     \item \textbf{Vector đặc trưng:} Kết quả là một vector $16$ chiều mang tính chất nén thông tin quan hệ trong đồ thị.
     \item \textbf{Chuẩn hóa đặc trưng:} Sử dụng \texttt{StandardScaler} để điều chỉnh quy mô các giá trị về phân phối chuẩn, tạo điều kiện cho bộ phân lớp máy học phía sau thiết lập các siêu phẳng phân tách hiệu quả hơn.
@@ -24,7 +24,7 @@
 
 Thay vì bắt mạng nơ-ron phải tự học các quy tắc phân ngưỡng phức tạp, nghiên cứu thực hiên đưa các vector biểu diễn đồ thị sang các thuật toán học máy truyền thống để xây dựng các ranh giới phân quyết rõ ràng. Các mô hình được thiết lập cấu hình chuyên biệt để xử lý vector nhúng $16$ chiều và phân tách $4$ cấp độ rủi ro:
 
-\begin{itemize}[label={--}, itemsep=3pt]
+\begin{itemize}[label={--}, itemsep=1pt]
     \item \textbf{K-Nearest Neighbors (KNN):} Thực hiện phân loại dựa trên mật độ phân phối với cấu hình $5$ láng giềng gần nhất ($k=5$). Đặc biệt, mô hình sử dụng cơ chế trọng số theo khoảng cách (\textit{distance weights}), giúp các láng giềng có độ tương đồng cao trong không gian nhúng có tầm ảnh hưởng lớn hơn đến kết quả dự đoán. Cách tiếp cận này giúp nhận diện chính xác các cụm tài khoản có cùng kịch bản hành vi dựa trên khoảng cách hình học thuần túy.
     
     \item \textbf{Linear SVC:} Thiết lập hệ thống siêu phẳng phân tách với giới hạn tối đa $3000$ vòng lặp để đảm bảo sự hội tụ trên không gian ẩn $16$ chiều. Để giải quyết tình trạng mất cân bằng dữ liệu giữa các lớp rủi ro, mô hình tích hợp tham số \texttt{class\_weight}, giúp điều chỉnh tầm quan trọng của các ít xuất hiện do dữ liệu nhãn mất cân bằng. Việc này cho phép SVC xây dựng các ranh giới phân tách hiệu quả hơn, đặc biệt là trong việc phân biệt giữa các lớp rủi ro có sự chồng lấn về đặc trưng.
