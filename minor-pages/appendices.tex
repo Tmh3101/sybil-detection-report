@@ -1,6 +1,6 @@
 \chapter{PHỤ LỤC A. KẾT QUẢ KIỂM THỬ VỚI CÁC KIẾN TRÚC DECOUPLED GNN-ML}
 
-\indent\indent Phụ lục này trình bày toàn bộ kết quả thực nghiệm của 20 tổ hợp kiến trúc phân lớp tách rời (Decoupled GNN-ML). Không gian thực nghiệm bao gồm 05 GNN backbone (GAT, GCN, GINE, PNA, Transformer) kết hợp với 04 mô hình học máy truyền thống (KNN, Linear SVC, Random Forest, XGBoost) trên ba phạm vi thời gian: Tuần, Tháng và Quý.\vspace{.3cm}
+\indent\indent Phụ lục này trình bày toàn bộ kết quả thực nghiệm của 20 tổ hợp kiến trúc phân lớp tách rời (Decoupled GNN-ML). Không gian thực nghiệm bao gồm 05 GNN backbone (GAT, GCN, GINE, PNA và Transformer) kết hợp với 04 mô hình học máy truyền thống (KNN, Linear SVC, Random Forest và XGBoost) trên ba phạm vi thời gian: Tuần, Tháng và Quý.\vspace{.3cm}
 
 Các giá trị được báo cáo là trung bình kèm theo độ lệch chuẩn sau 05 lượt chạy độc lập. Độ lệch chuẩn được ghi nhận bằng $0$ đối với KNN, Linear SVC và XGBoost do tính chất tất định của các thuật toán này trên cùng một phân vùng dữ liệu. Riêng Random Forest có độ biến thiên nội tại do cơ chế lấy mẫu ngẫu nhiên.
 
@@ -35,19 +35,19 @@ Các giá trị được báo cáo là trung bình kèm theo độ lệch chuẩ
 & Random Forest  & $.9667 \pm .0000$ & $.9776 \pm .0000$ 
                  & $\mathbf{.9472 \pm .0035}$ & $\mathbf{.9299 \pm .0067}$ 
                  & $\mathbf{.9170 \pm .0020}$ & $\mathbf{.8833 \pm .0025}$ \\
-& XGBoost        & $\mathbf{1.0000 \pm .0000}$ & $\mathbf{1.0000 \pm .0000}$ 
+& XGBoost        & $1.0000 \pm .0000$ & $1.0000 \pm .0000$ 
                  & $.9401 \pm .0000$ & $.9112 \pm .0000$ 
                  & $.9140 \pm .0000$ & $.8777 \pm .0000$ \\
 \midrule
 
 \multirow{4}{*}{\textbf{GCN}}
-& KNN            & $\mathbf{1.0000 \pm .0000}$ & $\mathbf{1.0000 \pm .0000}$ 
+& KNN            & $1.0000 \pm .0000$ & $1.0000 \pm .0000$ 
                  & $.9296 \pm .0000$ & $.9052 \pm .0000$ 
                  & $.8630 \pm .0000$ & $.8069 \pm .0000$ \\
-& Linear SVC     & $\mathbf{1.0000 \pm .0000}$ & $\mathbf{1.0000 \pm .0000}$ 
+& Linear SVC     & $1.0000 \pm .0000$ & $1.0000 \pm .0000$ 
                  & $.9155 \pm .0000$ & $.8884 \pm .0000$ 
                  & $.8560 \pm .0000$ & $.7974 \pm .0000$ \\
-& Random Forest  & $\mathbf{1.0000 \pm .0000}$ & $\mathbf{1.0000 \pm .0000}$ 
+& Random Forest  & $1.0000 \pm .0000$ & $1.0000 \pm .0000$ 
                  & $.9359 \pm .0016$ & $.9118 \pm .0022$ 
                  & $.8730 \pm .0023$ & $.8220 \pm .0027$ \\
 & XGBoost        & $.9333 \pm .0000$ & $.8715 \pm .0000$ 
@@ -86,13 +86,13 @@ Các giá trị được báo cáo là trung bình kèm theo độ lệch chuẩ
 \midrule
 
 \multirow{4}{*}{\textbf{Transformer}}
-& KNN            & $\mathbf{1.0000 \pm .0000}$ & $\mathbf{1.0000 \pm .0000}$ 
+& KNN            & $1.0000 \pm .0000$ & $1.0000 \pm .0000$ 
                  & $.9085 \pm .0000$ & $.8535 \pm .0000$ 
                  & $.9120 \pm .0000$ & $.8762 \pm .0000$ \\
-& Linear SVC     & $\mathbf{1.0000 \pm .0000}$ & $\mathbf{1.0000 \pm .0000}$ 
+& Linear SVC     & $1.0000 \pm .0000$ & $1.0000 \pm .0000$ 
                  & $.9120 \pm .0000$ & $.8636 \pm .0000$ 
                  & $.9110 \pm .0000$ & $.8725 \pm .0000$ \\
-& Random Forest  & $\mathbf{1.0000 \pm .0000}$ & $\mathbf{1.0000 \pm .0000}$ 
+& Random Forest  & $1.0000 \pm .0000$ & $1.0000 \pm .0000$ 
                  & $.9148 \pm .0029$ & $.8661 \pm .0066$ 
                  & $.9048 \pm .0011$ & $.8663 \pm .0011$ \\
 & XGBoost        & $.9667 \pm .0000$ & $.9048 \pm .0000$ 

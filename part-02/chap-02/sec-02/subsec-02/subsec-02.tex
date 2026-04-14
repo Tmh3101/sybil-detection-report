@@ -4,9 +4,9 @@
 
 \indent Để tạo ra biểu diễn toàn diện cho mỗi thực thể trong mạng lưới, đề tài thực hiện tổng hợp biểu diễn ngữ nghĩa văn bản và các chỉ số hành vi định lượng, thiết lập một không gian đặc trưng hỗn hợp phục vụ mục tiêu phân loại Sybil.\vspace{0.3cm}
 
-Quá trình bắt đầu bằng việc xây dựng dữ liệu định danh từ các trường \texttt{handle}, \texttt{display\_name} và \texttt{bio}, được ghép nối theo cấu trúc: \texttt{"Handle: \{h\}. Name: \{n\}. Bio: \{b\}"}. Bằng cách giữ nguyên ngữ cảnh tự nhiên và các ký tự đặc biệt, đề tài sử dụng mô hình \textbf{all-MiniLM-L6-v2} để ánh xạ chuỗi văn bản thành vector ngữ nghĩa \textbf{384 chiều}.\vspace{0.3cm}
+Quá trình bắt đầu bằng việc xây dựng dữ liệu định danh từ các trường \texttt{handle}, \texttt{display\_name} và \texttt{bio}, được ghép nối theo cấu trúc: \texttt{"Handle: \{h\}. Name: \{n\}. Bio: \{b\}"}. Bằng cách giữ nguyên ngữ cảnh tự nhiên và các ký tự đặc biệt, đề tài sử dụng mô hình \textit{all-MiniLM-L6-v2} để ánh xạ chuỗi văn bản thành vector ngữ nghĩa 384 chiều.\vspace{0.3cm}
 
-Song song đó, 12 chỉ số hành vi định lượng — bao gồm cường độ tương tác nội dung, điểm tin cậy trên nền tảng và thời gian hoạt động — được trích xuất để mô tả đặc tính của nút. Các giá trị thiếu (\textit{NULL}) được mặc định gán bằng \textbf{0}. Kết quả phân tích trên phạm vi dữ liệu Quý tại \textbf{Hình \ref{fig:FeatureCorrelation}} minh chứng bộ đặc trưng này có độ bao phủ thông tin tốt. Mặc dù tồn tại sự tương quan cao giữa các hành vi cùng nhóm (như \texttt{total\_posts} và \texttt{total\_comments} với $r=0.86$), phần lớn các chỉ số còn lại đều duy trì tính độc lập cao.\vspace{0.3cm}
+Song song đó, 12 chỉ số hành vi định lượng — bao gồm cường độ tương tác nội dung, điểm tin cậy trên nền tảng và thời gian hoạt động — được trích xuất để mô tả đặc tính của nút. Các giá trị thiếu (\textit{NULL}) được mặc định gán bằng \textit{0}. Kết quả phân tích trên phạm vi dữ liệu Quý tại \textbf{Hình \ref{fig:FeatureCorrelation}} minh chứng bộ đặc trưng này có độ bao phủ thông tin tốt. Mặc dù tồn tại sự tương quan cao giữa các hành vi cùng nhóm (như \texttt{total\_posts} và \texttt{total\_comments} với $r=0.86$), phần lớn các chỉ số còn lại đều duy trì tính độc lập cao.\vspace{0.3cm}
 
 \begin{figure}[H]
     \centering
@@ -19,7 +19,7 @@ Cuối cùng, vector đặc trưng của mỗi nút $v_i$ được hình thành 
 \[
     X_i = [E_{semantic}(384) \parallel B_{behavioral}(12)] \in \mathbb{R}^{396}
 \]
-\indent Không gian đặc trưng \textbf{396 chiều} này đóng vai trò là dữ liệu đầu vào cho mô hình Graph Autoencoder và GNN baseline trong các quy trình gán nhãn giả lập và huấn luyện có giám sát ở các giai đoạn tiếp theo.\vspace{0.3cm}
+\indent Không gian đặc trưng 396 chiều này đóng vai trò là dữ liệu đầu vào cho mô hình Graph Autoencoder và GNN baseline trong các quy trình gán nhãn giả lập và huấn luyện có giám sát ở các giai đoạn tiếp theo.\vspace{0.3cm}
 
 %==========================================================================================
 
@@ -68,9 +68,9 @@ Tiếp theo, thuật toán K-Means được áp dụng trên các vector embeddi
 
 Kết quả thực nghiệm tại \textbf{Hình \ref{fig:KMeansEval}} cho thấy các điểm cân bằng tối ưu được hệ thống lựa chọn như sau:
 \begin{itemize}[label={--}, itemsep=1pt]
-    \item \textbf{Phạm vi Tuần:} Chọn $\mathbf{K=14}$, tại đây hệ số Silhouette đạt đỉnh cục bộ ($0.4901$) và Davies-Bouldin ở mức hợp lý ($0.8398$).
-    \item \textbf{Phạm vi Tháng:} Đạt sự đồng thuận cao giữa hai thước đo tại $\mathbf{K=122}$ (Silhouette cực đại ở $0.6391$ và Davies-Bouldin chạm đáy tại $0.7452$).
-    \item \textbf{Phạm vi Quý:} Trong không gian tìm kiếm $K \in [160, 180]$, mặc dù Silhouette ưu tiên $K=167$, hệ thống quyết định chọn $\mathbf{K=179}$ vì chỉ số Davies-Bouldin đạt mức cực tiểu sâu nhất ($1.1087$), giúp các cấu trúc Sybil phức tạp được bó chặt tốt hơn.
+    \item \textbf{Phạm vi Tuần:} Chọn $\mathit{K=14}$, tại đây hệ số Silhouette đạt đỉnh cục bộ ($0.4901$) và Davies-Bouldin ở mức hợp lý ($0.8398$).
+    \item \textbf{Phạm vi Tháng:} Đạt sự đồng thuận cao giữa hai thước đo tại $\mathit{K=122}$ (Silhouette cực đại ở $0.6391$ và Davies-Bouldin chạm đáy tại $0.7452$).
+    \item \textbf{Phạm vi Quý:} Trong không gian tìm kiếm $K \in [160, 180]$, mặc dù Silhouette ưu tiên $K=167$, hệ thống quyết định chọn $\mathit{K=179}$ vì chỉ số Davies-Bouldin đạt mức cực tiểu sâu nhất ($1.1087$), giúp các cấu trúc Sybil phức tạp được bó chặt tốt hơn.
 \end{itemize}
 
 \indent\indent Điểm đặc thù trong kết quả phân cụm là hệ thống đã lựa chọn các giá trị $K$ tương đối lớn, dẫn đến quy mô trung bình của mỗi cụm khá nhỏ (biến thiên từ 11 đến 28 nút/cụm). Để biện minh cho không gian khảo sát tham số này, nghiên cứu áp dụng trực tiếp công thức ước lượng \textit{Core-Whisker} đã được thiết lập tại Mục 2.5.1 (Chương 1).\vspace{0.3cm}
@@ -120,9 +120,9 @@ Số lượng nhãn \texttt{MALICIOUS} tăng mạnh từ phạm vi Tuần (07 th
 
 \textit{2.4.1. Xử lý mất cân bằng nhãn}\vspace{0.2cm}
 
-Sự chênh lệch đáng kể về số lượng giữa các lớp hành vi — đặc biệt là sự thiểu số của lớp \textit{Malicious}. Để khắc phục, đề tài áp dụng sử dụng trọng số lớp trong hàm mất mát. Trọng số được tính toán nghịch đảo với tần suất xuất hiện của mỗi lớp trong tập huấn luyện, buộc mô hình phải tăng cường sự tập trung vào các nhóm thực thể rủi ro cao.\vspace{0.3cm}
+Sự chênh lệch đáng kể về số lượng giữa các lớp hành vi, đặc biệt là sự thiểu số của lớp \texttt{MALICIOUS}. Để khắc phục, đề tài áp dụng sử dụng trọng số lớp trong hàm mất mát. Trọng số được tính toán nghịch đảo với tần suất xuất hiện của mỗi lớp trong tập huấn luyện, buộc mô hình phải tăng cường sự tập trung vào các nhóm thực thể rủi ro cao.\vspace{0.3cm}
 
-Chi tiết các giá trị trọng số được áp dụng cho từng phạm vi dữ liệu được trình bày tại \textbf{Bảng \ref{tab:ClassWeights}}. Có thể thấy tại phạm vi Quý, lớp \textit{Malicious} được gán trọng số $3.8634$, cao hơn gấp 8 lần so với lớp \textit{High Risk} ($0.4786$), giúp đảm bảo độ nhạy trong việc nhận diện Sybil.
+Chi tiết các giá trị trọng số được áp dụng cho từng phạm vi dữ liệu được trình bày tại \textbf{Bảng \ref{tab:ClassWeights}}. Có thể thấy tại phạm vi Quý, lớp \texttt{MALICIOUS} được gán trọng số $3.8634$, cao hơn gấp 8 lần so với lớp \texttt{HIGH\_RISK} ($0.4786$), giúp đảm bảo độ nhạy trong việc nhận diện Sybil.
 
 \begin{table}[H]
     \centering

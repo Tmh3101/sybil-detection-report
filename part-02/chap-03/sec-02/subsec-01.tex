@@ -2,7 +2,7 @@
 
 \textit{2.1.1. Tham số mô hình, siêu tham số và kỹ thuật huấn luyện}\vspace{0.2cm}
 
-\indent Trong quá trình thực nghiệm, đề tài áp dụng hai chiến lược huấn luyện khác nhau tùy thuộc vào kiến trúc mô hình. Đối với các mô hình GNN cơ sở, quy trình huấn luyện được thực hiện theo phương thức học có giám sát từ đầu đến cuối. Ngược lại, đối với kiến trúc \textbf{Decoupled GNN-ML}, hệ thống sử dụng GNN như một bộ trích xuất đặc trưng tĩnh bằng cách đóng băng toàn bộ trọng số sau khi đã tối ưu hóa, sau đó trích xuất các vector embedding để huấn luyện các bộ phân lớp máy học truyền thống.\vspace{0.3cm}
+\indent Trong quá trình thực nghiệm, đề tài áp dụng hai chiến lược huấn luyện khác nhau tùy thuộc vào kiến trúc mô hình. Đối với các mô hình GNN cơ sở, quy trình huấn luyện được thực hiện theo phương thức học có giám sát từ đầu đến cuối. Ngược lại, đối với kiến trúc \textit{Decoupled GNN-ML}, hệ thống sử dụng GNN như một bộ trích xuất đặc trưng tĩnh bằng cách đóng băng toàn bộ trọng số sau khi đã tối ưu hóa, sau đó trích xuất các vector embedding để huấn luyện các bộ phân lớp máy học truyền thống.\vspace{0.3cm}
 
 \textbf{* Thống kê tham số mô hình:}
 Đối với các mô hình GNN cơ sở được huấn luyện từ đầu, toàn bộ các trọng số đều tham gia vào quá trình tối ưu hóa. Chi tiết độ phức tạp của các mạng GNN được trình bày tại \textbf{Bảng \ref{tab:ModelParamsComp}}.
@@ -29,7 +29,7 @@
     \end{tabular}
 \end{table}
 
-Đối với kiến trúc \textbf{Decoupled GNN-ML}, cấu trúc mô hình là sự tổ hợp linh hoạt giữa các mạng GNN cơ sở và các thuật toán học máy truyền thống (KNN, LinearSVC, Random Forest, XGBoost) để phân lớp. Trong phương pháp tiếp cận này, toàn bộ trọng số của phần mạng GNN đã được huấn luyện trước và đóng băng hoàn toàn. Do đó, số lượng tham số cần cập nhật thực tế phụ thuộc hoàn toàn vào bộ phân lớp máy học được lựa chọn. Điều này giúp giảm thiểu đột phá chi phí và thời gian tính toán trong pha huấn luyện bộ phân lớp.\vspace{0.3cm}
+Đối với kiến trúc \textit{Decoupled GNN-ML}, cấu trúc mô hình là sự tổ hợp linh hoạt giữa các mạng GNN cơ sở và các thuật toán học máy truyền thống (KNN, LinearSVC, Random Forest, XGBoost) để phân lớp. Trong phương pháp tiếp cận này, toàn bộ trọng số của phần mạng GNN đã được huấn luyện trước và đóng băng hoàn toàn. Do đó, số lượng tham số cần cập nhật thực tế phụ thuộc hoàn toàn vào bộ phân lớp máy học được lựa chọn. Điều này giúp giảm thiểu đột phá chi phí và thời gian tính toán trong pha huấn luyện bộ phân lớp.\vspace{0.3cm}
 
 \textbf{* Siêu tham số cho quy trình gán nhãn giả lập (GAE \& KMeans):}\vspace{0.2cm}
 
@@ -39,7 +39,7 @@ Quy trình xây dựng nhãn giả lập sử dụng mô hình GAE với Encoder
     \item \textbf{Phạm vi Quý:} Do quy mô đồ thị lớn và phức tạp hơn, số epoch được tăng lên 5000; ngưỡng dừng sớm $patience=200$; tối ưu số cụm $K$ trong khoảng $[160, 180]$.
 \end{itemize}
 
-\textbf{* Siêu tham số và kỹ thuật huấn luyện GNN Baselines:}\vspace{0.2cm}
+\textbf{* Siêu tham số và kỹ thuật huấn luyện GNN cơ sở:}\vspace{0.2cm}
 
 Để đảm bảo tính khách quan, giảm thiểu sự ảnh hưởng của việc khởi tạo ngẫu nhiên và khẳng định khả năng tái lập, mỗi mô hình Baseline được huấn luyện và đánh giá lặp lại độc lập 05 lần với các hạt giống ngẫu nhiên cố định. Kết quả hiệu năng cuối cùng của mỗi mô hình được báo cáo dưới dạng giá trị trung bình cộng của các lượt chạy.\vspace{0.2cm}
 
@@ -47,18 +47,18 @@ Quá trình huấn luyện áp dụng chung một bộ thiết lập siêu tham 
 \begin{itemize}[label={--}, itemsep=1pt]
     \item \textbf{Cấu hình tham số tối ưu:} 
     \begin{itemize}[label={+}, itemsep=1pt]
-        \item Thuật toán tối ưu: \textbf{Adam} (\textit{Adaptive Moment Estimation}).
+        \item Thuật toán tối ưu: Adam (\textit{Adaptive Moment Estimation}).
         \item Tốc độ học khởi tạo (\textit{Learning rate}): $lr = 10^{-3}$.
         \item Trọng số điều chuẩn L2 (\textit{Weight decay}): $5 \times 10^{-4}$ nhằm hạn chế sự bùng nổ của các trọng số và ngăn ngừa hiện tượng quá khớp.
         \item \textit{Max Epochs}: 2000.
     \end{itemize}
     
-    \item \textbf{Hàm mất mát:} Đề tài sử dụng hàm \textbf{Weighted Cross-Entropy}. Thay vì tính lỗi đồng đều cho mọi mẫu dữ liệu, hàm này tích hợp trực tiếp các giá trị \textit{Class Weights} (đã được tính toán dựa trên phân phối thực tế của từng phạm vi ở Chương 2).
+    \item \textbf{Hàm mất mát:} Đề tài sử dụng hàm \textit{Weighted Cross-Entropy}. Thay vì tính lỗi đồng đều cho mọi mẫu dữ liệu, hàm này tích hợp trực tiếp các giá trị \textit{Class Weights} (đã được tính toán dựa trên phân phối thực tế của từng phạm vi ở Chương 2).
     
-    \item \textbf{Cơ chế dừng sớm:} Để tối ưu hóa thời gian huấn luyện và lưu lại phiên bản mô hình có khả năng tổng quát hóa tốt nhất, hệ thống giám sát liên tục chỉ số \textbf{Macro F1-Score} trên tập kiểm định. Cơ chế dừng sớm được kích hoạt với ngưỡng kiên nhẫn \textit{patience} = 200. Nghĩa là, nếu sau 200 epoch liên tiếp mà chỉ số \textit{Validation Macro F1} không ghi nhận kỷ lục mới, quá trình huấn luyện sẽ tự động chấm dứt.
+    \item \textbf{Cơ chế dừng sớm:} Để tối ưu hóa thời gian huấn luyện và lưu lại phiên bản mô hình có khả năng tổng quát hóa tốt nhất, hệ thống giám sát liên tục chỉ số \textit{Macro F1-Score} trên tập kiểm định. Cơ chế dừng sớm được kích hoạt với ngưỡng kiên nhẫn \textit{patience} = 200. Nghĩa là, nếu sau 200 epoch liên tiếp mà chỉ số \textit{Validation Macro F1} không ghi nhận kỷ lục mới, quá trình huấn luyện sẽ tự động chấm dứt.
 \end{itemize}
 
-\textbf{* Cấu hình kiến trúc phân lớp tách rời (Decoupled GNN-ML):}\vspace{0.2cm}
+\textbf{* Cấu hình kiến trúc Decoupled GNN-ML:}\vspace{0.2cm}
 
 Tại giai đoạn này, hệ thống nạp trọng số tốt nhất của GNN để trích xuất vector nhúng 16 chiều thông qua cơ chế \textit{forward hook} tại tầng tích chập cuối cùng. Các vector này được chuẩn hóa qua \textit{StandardScaler} trước khi đưa vào 04 bộ phân lớp:
 \begin{itemize}[label={--}, itemsep=1pt]

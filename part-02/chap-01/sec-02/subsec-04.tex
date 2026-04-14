@@ -15,6 +15,6 @@
     \label{fig:GAE}
 \end{figure}
 
-Việc tối ưu hóa GAE được thực hiện bằng cách giảm thiểu sai số tái cấu trúc (Reconstruction Loss) giữa đồ thị thực tế $A$ và đồ thị dự đoán $\hat{A}$. Thông qua quá trình này, các thực thể có hành vi mạng lưới tương đồng --- như các cụm tài khoản Sybil cùng thực hiện tương tác chéo hoặc cùng chung quyền sở hữu ví --- sẽ được ánh xạ vào các vị trí nằm gần nhau trong không gian nhúng 16 chiều. \vspace{0.3cm}
+Việc tối ưu hóa GAE được thực hiện bằng cách giảm thiểu sai số tái cấu trúc (Reconstruction Loss) giữa đồ thị thực tế $A$ và đồ thị dự đoán $\hat{A}$. Thông qua quá trình này, các thực thể có hành vi mạng lưới tương đồng, như các cụm tài khoản Sybil cùng thực hiện tương tác chéo hoặc cùng được sở hữu bởi một địa chỉ ví, sẽ được ánh xạ vào các vị trí nằm gần nhau trong không gian nhúng 16 chiều. \vspace{0.3cm}
 
-Kết quả của giai đoạn này là các vector nhúng giàu thông tin ngữ cảnh và cấu trúc. Đây chính là tiền đề quan trọng để thuật toán phân cụm ở bước tiếp theo, biến bài toán thiếu nhãn ban đầu thành bài toán gán nhãn giả lập (Pseudo-labeling) có tính chính xác cao, tạo điều kiện cho các giai đoạn học có giám sát về sau.
+Kết quả của giai đoạn này là các vector nhúng giàu thông tin ngữ cảnh và cấu trúc. Đây chính là tiền đề quan trọng để thuật toán phân cụm ở bước tiếp theo, biến bài toán thiếu nhãn ban đầu thành bài toán gán nhãn giả lập có tính chính xác cao, tạo điều kiện cho các giai đoạn học có giám sát về sau.

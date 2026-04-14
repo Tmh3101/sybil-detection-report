@@ -12,14 +12,14 @@ Mặc dù kiến trúc BERT (Bidirectional Encoder Representations from Transfor
     \label{fig:SBERT}
 \end{figure}
 
-Cơ chế trích xuất đặc trưng của SBERT trong hệ thống được vận hành như sau:\vspace{-0.1cm}
+Cơ chế trích xuất đặc trưng của SBERT trong hệ thống được vận hành như sau:
 \begin{itemize}[label={--}, itemsep=1pt]
     \item \textbf{Kiến trúc mạng Siamese:} Các trường thông tin văn bản (Handle, Display Name, Bio) của tài khoản được kết hợp lại và đưa qua một mạng Transformer chia sẻ trọng số để tạo ra các vector ngữ cảnh động cho từng từ.
     \item \textbf{Chiến lược trích xuất đặc trưng:} Hệ thống áp dụng chiến lược Mean Pooling để tính trung bình các vector đầu ra của các từ, tạo thành một vector đại diện cố định duy nhất cho toàn bộ thông tin hồ sơ của một tài khoản.
     \item \textbf{Ánh xạ ngữ nghĩa:} Thông qua quá trình này, các tài khoản có hành vi sao chép hồ sơ hoặc sử dụng các mẫu tên định danh tương đồng sẽ được ánh xạ vào các vùng lân cận trong không gian vector.
 \end{itemize}
 
-Trong đề tài này, để đảm bảo tốc độ xử lý cho đồ thị quy mô lớn mà vẫn giữ được độ chính xác cao, mô hình \texttt{all-MiniLM-L6-v2} được lựa chọn làm bộ trích xuất đặc trưng văn bản cốt lõi. Đây là một mô hình thuộc họ SBERT, sở hữu các đặc tính kỹ thuật ưu việt:\vspace{-0.1cm}
+Trong đề tài này, để đảm bảo tốc độ xử lý cho đồ thị quy mô lớn mà vẫn giữ được độ chính xác cao, mô hình \textit{all-MiniLM-L6-v2} được lựa chọn làm bộ trích xuất đặc trưng văn bản cốt lõi. Đây là một mô hình thuộc họ SBERT, sở hữu các đặc tính kỹ thuật ưu việt:\vspace{-0.1cm}
 \begin{itemize}[label={--}, itemsep=1pt]
     \item \textbf{Kỹ thuật chưng cất tri thức:} Sử dụng kiến trúc MiniLM để mô phỏng lại các mối quan hệ tự chú ý (\textit{self-attention}) từ các mô hình ngôn ngữ khổng lồ. Điều này giúp mô hình duy trì khả năng hiểu ngữ cảnh sâu sắc của SBERT nhưng với kích thước nhỏ gọn hơn nhiều lần.
     \item \textbf{Hiệu suất vận hành:} Với cấu hình 6 lớp Transformer và mô hình cho tốc độ suy luận nhanh gấp 5 lần so với các phiên bản BERT-base, tối ưu hóa việc xử lý đồng thời hàng nghìn nút trên đồ thị mạng xã hội Web3.
