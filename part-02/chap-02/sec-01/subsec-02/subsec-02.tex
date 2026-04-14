@@ -1,40 +1,104 @@
-\subsubsection{1.2. Kiến trúc mạng tự mã hóa đồ thị (GAE + GATv2)}
+\subsubsection{1.2. Phân hệ đánh giá rủi ro}
 
-\indent\indent Với cơ sở toán học của bộ mã hóa đồ thị đã được thiết lập tại Mục 2.4 (Chương 1), phần này đi sâu vào việc cấu hình tham số mạng thực tế nhằm tối ưu hóa khả năng nén đặc trưng cấu trúc. Để thực hiện hạ chiều từ vector đặc trưng nút 396 chiều gốc, bộ mã hóa được thiết kế với cấu trúc GATv2 hai tầng ẩn. Quá trình này thực hiện hạ chiều dữ liệu tuần tự về 32 chiều và cuối cùng là 16 chiều trong không gian tiềm ẩn, đảm bảo sự cân bằng giữa tính cô đọng dữ liệu và tính bảo toàn các ràng buộc đồ thị đa quan hệ.\vspace{0.3cm}
-
-Kiến trúc chi tiết của mô hình GAE được minh họa tại \textbf{Hình \ref{fig:GAEPipeline}}. Mô hình được thiết kế với hai thành phần cốt lõi: Bộ mã hóa và Bộ giải mã.
+\indent\indent Luồng suy diễn trực tuyến dành cho người dùng cuối được minh họa tại \textbf{Hình \ref{fig:PredictionPipeline}}. Phân hệ này được thiết kế ưu tiên về tốc độ phản hồi và cho phép tích hợp linh hoạt các mô hình dự đoán tối ưu nhất.
 
 \begin{figure}[H]
     \centering
-    \includegraphics[width=0.5\linewidth]{images/part-02/chap-02/sec-01/GAEPipeline.png}
-    \vspace{0.2cm}
-    \caption{Kiến trúc Mạng tự mã hóa đồ thị với bộ mã hóa GATv2}
-    \label{fig:GAEPipeline}
+    \includegraphics[width=\linewidth]{images/part-02/chap-02/sec-01/PredictionPipeline.png}
+    \vspace{0.1cm}
+    \caption{Sơ đồ kiến trúc luồng đánh giá rủi ro}
+    \label{fig:PredictionPipeline}
 \end{figure}
 
-\vspace{0.1cm}
-\textit{1.2.1. Bộ mã hóa GATv2 Encoder}\vspace{0.2cm}
+\textbf{Đặc tả dữ liệu:}
+\begin{itemize}[label={--}, itemsep=1pt]
+    \item \textbf{Đầu vào:} \textit{Profile ID} (Định danh duy nhất của tài khoản trên nền tảng Lens Protocol) do người dùng hoặc hệ thống truyền vào để yêu cầu kiểm tra mức độ rủi ro Sybil.
+    \item \textbf{Đầu ra:} Phán quyết cuối cùng phân loại tài khoản vào một trong bốn nhãn: \texttt{BENIGN}, \texttt{LOW\_RISK}, \texttt{HIGH\_RISK}, hoặc \texttt{MALICIOUS}.
+\end{itemize}\vspace{0.2cm}
 
-Hệ thống sử dụng Mạng nơ-ron tích chập đồ thị có cơ chế chú ý nâng cao (\textit{GATv2}) làm bộ mã hóa. Đặc biệt, bộ mã hóa được thiết kế để duy trì cơ chế Điều hướng chú ý thông qua tham số \texttt{edge\_dim=1}, giúp hấp thụ trực tiếp các trọng số cạnh đã được chuẩn hóa Logarit ở giai đoạn trước vào mọi bước nhảy lan truyền.\vspace{0.3cm}
-
-Chi tiết luồng xử lý qua các tầng của bộ mã hóa được minh họa tại \textbf{Hình \ref{fig:GATEncoder}}:
-\begin{figure}[H]
-    \centering
-    % Đổi tên file ảnh dưới đây cho khớp với sơ đồ GAT Encoder bạn vừa vẽ
-    \includegraphics[width=0.5\linewidth]{images/part-02/chap-02/sec-01/GATEncoder.png}
-    \vspace{0.2cm}
-    \caption{Kiến trúc luồng dữ liệu bên trong Bộ mã hóa GATv2}
-    \label{fig:GATEncoder}
-\end{figure}
-
-Kiến trúc mã hóa bao gồm hai tầng tích chập:
-\begin{itemize}[label={--}, itemsep=3pt]
-    \item \textbf{Tầng tích chập thứ nhất (Conv1):} Nhận đầu vào là ma trận đặc trưng $X \in \mathbb{R}^{N \times 396}$. Tầng này sử dụng cơ chế đa chú ý với $4$ heads nhằm khai phá đặc trưng dưới nhiều không gian biểu diễn khác nhau. Mỗi head ánh xạ dữ liệu thành không gian $32$ chiều. Các kết quả sau đó được ghép nối lại, tạo ra vector trung gian có kích thước $128$ chiều ($32 \times 4$). Đầu ra đi qua hàm kích hoạt phi tuyến ELU và một lớp Dropout với tỷ lệ $0.1$ nhằm ngăn chặn over-fitting.
-    \item \textbf{Tầng tích chập thứ hai (Conv2):} Nhận vector $128$ chiều làm đầu vào và thiết lập cơ chế chú ý đơn ($1$ head). Cấu hình này ép buộc mô hình tổng hợp các góc nhìn từ tầng trước để nén thông tin thành vector tiềm ẩn cuối cùng $Z \in \mathbb{R}^{N \times 16}$.
+Kiến trúc thực thi được tối ưu để xử lý các yêu cầu truy vấn đơn lẻ với độ trễ thấp thông qua ba bước chuyển đổi dữ liệu:
+\begin{itemize}[label={--}, itemsep=1pt]
+    \item \textbf{Cơ chế truy xuất và định tuyến:} Hệ thống ưu tiên truy xuất đồ thị tham chiếu có sẵn để giảm thiểu tài nguyên. Đối với tài khoản mới, luồng dữ liệu được định tuyến qua API Lens Protocol để thu thập thông tin tức thời.
+    \item \textbf{Thiết kế đồ thị cục bộ:} Thay vì xử lý toàn bộ đồ thị khổng lồ, hệ thống chỉ tái tạo mạng lưới lân cận của \textit{Profile ID} mục tiêu. Thiết kế này giúp khoanh vùng bối cảnh cấu trúc mạng cần thiết, đảm bảo tính giải thích dựa trên các nút láng giềng.
+    \item \textbf{Thực thi dự đoán tách rời:} Luồng dữ liệu cuối cùng được đưa qua lõi dự đoán đã được huấn luyện sẵn. Vector tiềm ẩn từ bộ mã hóa GNN sẽ được đưa vào mô hình phân lớp để xuất ra phán quyết rủi ro cuối cùng theo thời gian thực.
 \end{itemize}
 
-\textit{1.2.2. Bộ giải mã (Inner Product Decoder)}\vspace{0.2cm}
+\textit{1.2.1. Các mô hình GNN Baseline}\vspace{0.2cm}
 
-Thay vì sử dụng một mạng nơ-ron phức tạp, bộ giải mã của GAE tính toán tích vô hướng giữa các vector embedding của các cặp nút ($Z_i \cdot Z_j$) để dự đoán xác suất tồn tại của một cạnh nối giữa chúng. Đầu ra của hệ thống được đánh giá thông qua hàm lỗi tái tạo dựa trên Binary Cross-Entropy (BCE). Khung học không giám sát này sẽ liên tục sử dụng sai số tái tạo để lan truyền ngược, ép các trọng số của GATv2 phải điều chỉnh sao cho đồ thị tái tạo từ không gian tiềm ẩn gần giống nhất với đồ thị đa quan hệ gốc ban đầu.\vspace{0.3cm}
+Đề tài thực hiện xây dựng và huấn luyện 5 mô hình mạng nơ-ron đồ thị cơ sở bao gồm: GATv2, GCN, GINE, PNA và Graph Transformer. Mục tiêu của bước này là tạo ra một mốc tham chiếu để đánh giá khả năng học đặc trưng đồ thị với các cơ chế truyền tin khác nhau, đồng thời cung cấp vector embedding cho giai đoạn phân loại nâng cao phía sau.\vspace{0.3cm}
 
-\textbf{Đầu ra cuối cùng:} Sau khi kết thúc quá trình tối ưu hóa, mô hình trích xuất ma trận có kích thước $N \times 16$. Ma trận này chứa đựng toàn bộ tri thức về cấu trúc mạng lưới của đồ thị, đóng vai trò là đầu vào tiên quyết cho quy trình phân cụm và gán nhãn giả lập phía sau.
+Kiến trúc tổng quát của các mô hình GNN baseline được minh họa tại \textbf{Hình \ref{fig:GNNArchitecture}}, tuân thủ luồng xử lý đồng bộ để đảm bảo tính công bằng trong thực nghiệm:\vspace{0.3cm}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.5\linewidth]{images/part-02/chap-02/sec-01/GNNArchitecture.png}
+    \vspace{0.2cm}
+    \caption{Kiến trúc tổng quan của các mô hình GNN Baseline}
+    \label{fig:GNNArchitecture}
+\end{figure}
+
+\textbf{* Đặc tả dữ liệu đầu vào và đầu ra}
+
+\begin{itemize}[label={--}, itemsep=1pt]
+    \item \textbf{Đầu vào:} Dữ liệu đồ thị bao gồm ma trận đặc trưng nút $X$ ($396$ chiều) và các thuộc tính cạnh đại diện cho trọng số hành vi $w_{ij}$.
+    \item \textbf{Đầu ra:} Kết quả dự đoán xác suất cho 4 lớp đối tượng: \texttt{BENIGN}, \texttt{LOW\_RISK}, \texttt{HIGH\_RISK} và \texttt{MALICIOUS}.
+\end{itemize}
+
+\textbf{* Quy trình xử lý}\vspace{0.2cm}
+
+\indent Quy trình xử lý của các mô hình baseline được chia thành hai giai đoạn chính nhằm tối ưu hóa việc trích xuất tín hiệu từ đồ thị thưa thớt:
+
+\begin{itemize}[label={--}, itemsep=1pt]
+    \item \textbf{Giai đoạn trích xuất đặc trưng:} Hệ thống sử dụng cấu trúc hai tầng tích chập đồ thị (\textit{Message Passing}) để khai thác thông tin cấu trúc:
+    \begin{itemize}[label={+}, itemsep=1pt]
+        \item \textbf{Tầng mở rộng (Layer 1):} Chuyển đổi từ 396 đặc trưng thô sang không gian ẩn trung gian (32 đơn vị × số đầu chú ý). Tại đây, hàm kích hoạt ELU và Dropout (0.1) được áp dụng để ổn định tín hiệu và chống quá khớp.
+        \item \textbf{Tầng nén đặc trưng (Layer 2):} Toàn bộ các mô hình đều được ép về một không gian 16 chiều. Vector này đóng vai trò là thông tin tổng hợp tinh túy nhất về hành vi của một nút.
+    \end{itemize}
+    \item \textbf{Bộ phân lớp (Linear Classifier):} Sử dụng một tầng tuyến tính (\textit{Fully Connected}) để ánh xạ vector biểu diễn 16 chiều thu được từ tầng nén sang không gian nhãn mục tiêu.
+\end{itemize}
+
+\textbf{* Đặc thù cấu hình các biến thể kiến trúc}\vspace{0.2cm}
+
+\indent Mặc dù cùng tuân thủ khung kiến trúc chuẩn, mỗi biến thể GNN được tùy chỉnh cơ chế truyền tin để xử lý trọng số cạnh $w_{ij}$ theo các phương pháp đặc thù:
+\begin{itemize}[label={--}, itemsep=1pt]
+    \item \textbf{GATv2 \& Transformer:} Sử dụng cơ chế chú ý động với 4 đầu chú ý độc lập, tích hợp $w_{ij}$ trực tiếp vào quá trình tính điểm chú ý.
+    \item \textbf{GCN:} Tiếp nhận $w_{ij}$ dưới dạng \texttt{edge\_weight} để điều chỉnh cường độ lan truyền tin nhắn một cách trực tiếp dựa trên cấu trúc đồ thị.
+    \item \textbf{GINE:} Sử dụng mạng nơ-ron đa tầng nội tại để nhúng trọng số cạnh vào thông điệp của láng giềng trước khi thực hiện phép cộng.
+    \item \textbf{PNA:} Áp dụng ghép nối $w_{ij}$ vào đặc trưng láng giềng thông qua tầng tiền xử lý $MLP_{pre}$. Điều này giúp 4 chỉ số thống kê (đặc biệt là độ lệch chuẩn $\sigma$) định lượng trực tiếp sự biến thiên của cường độ hành vi.
+\end{itemize}
+
+\textit{1.2.2. Kiến trúc Decoupled GNN-ML}\vspace{0.2cm}
+
+Đề tài thực hiện thực nghiêm trên các kiến trúc mô hình \textit{Decoupled GNN-ML}. Lựa chọn này xuất phát từ việc nhận diện các giới hạn của các lớp nơ-ron trong mạng đồ thị thuần túy. Các sự kết hợp này giải quyết hạn chế thiết lập các ranh giới rõ ràng trên dữ liệu không đồng nhất của các lớp nơ-ron trong mạng đồ thị bằng cách tách rời quy trình học đặc trưng và quy trình quyết định. Sơ đồ luồng xử lý được mô tả tại \textbf{Hình \ref{fig:DecoupledML}}:\vspace{0.3cm}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.5\linewidth]{images/part-02/chap-02/sec-01/DecoupledMLArchitecture.png}
+    \vspace{0.1cm}
+    \caption{Sơ đồ luồng xử lý của kiến trúc Decoupled GNN-ML}
+    \label{fig:DecoupledML}
+\end{figure}
+
+\textit{1.5.1. Cơ chế trích xuất đặc trưng và chuẩn hóa}\vspace{0.2cm}
+
+\indent Để khắc phục tình trạng hiện tượng các mạng nơ-ron gặp khó khăn trong việc điều chỉnh biên độ đầu ra một cách chính xác do sai lệch về phạm vi dự đoán, nghiên cứu này tận dụng GNN như một bộ trích xuất biểu diễn cấu trúc:
+
+\begin{itemize}[label={--}, itemsep=1pt]
+    \item \textbf{Trích xuất đặc trưng:} Hệ thống thực hiện trích xuất vector từ tầng tích chập thứ hai. Việc này giúp thu thập các biểu diễn đã được tổng hợp thông tin liên kết láng giềng nhưng chưa bị áp đặt bởi các quy tắc quyết định.
+    \item \textbf{Vector đặc trưng:} Kết quả là một vector $16$ chiều mang tính chất nén thông tin quan hệ trong đồ thị.
+    \item \textbf{Chuẩn hóa đặc trưng:} Sử dụng \textit{StandardScaler} để điều chỉnh quy mô các giá trị về phân phối chuẩn, tạo điều kiện cho bộ phân lớp máy học phía sau thiết lập các siêu phẳng phân tách hiệu quả hơn.
+\end{itemize}
+
+\textit{1.5.2. Bộ phân lớp dựa trên Machine Learning}\vspace{0.2cm}
+
+Thay vì bắt mạng nơ-ron phải tự học các quy tắc phân ngưỡng phức tạp, nghiên cứu thực hiên đưa các vector biểu diễn đồ thị sang các thuật toán học máy truyền thống để xây dựng các ranh giới phân quyết rõ ràng. Các mô hình được thiết lập cấu hình chuyên biệt để xử lý vector nhúng $16$ chiều và phân tách $4$ cấp độ rủi ro:
+
+\begin{itemize}[label={--}, itemsep=1pt]
+    \item \textbf{K-Nearest Neighbors (KNN):} Thực hiện phân loại dựa trên mật độ phân phối với cấu hình $5$ láng giềng gần nhất ($k=5$). Đặc biệt, mô hình sử dụng cơ chế trọng số theo khoảng cách, giúp các láng giềng có độ tương đồng cao trong không gian nhúng có tầm ảnh hưởng lớn hơn đến kết quả dự đoán. Cách tiếp cận này giúp nhận diện chính xác các cụm tài khoản có cùng kịch bản hành vi dựa trên khoảng cách hình học thuần túy.
+    
+    \item \textbf{Linear SVC:} Thiết lập hệ thống siêu phẳng phân tách với giới hạn tối đa $3000$ vòng lặp để đảm bảo sự hội tụ trên không gian ẩn $16$ chiều. Để giải quyết tình trạng mất cân bằng dữ liệu giữa các lớp rủi ro, mô hình tích hợp tham số \textit{class\_weight}, giúp điều chỉnh tầm quan trọng của các ít xuất hiện do dữ liệu nhãn mất cân bằng. Việc này cho phép SVC xây dựng các ranh giới phân tách hiệu quả hơn, đặc biệt là trong việc phân biệt giữa các lớp rủi ro có sự chồng lấn về đặc trưng.
+    
+    \item \textbf{Random Forest:} Sử dụng hệ thống tập hợp gồm $100$ cây quyết định độc lập kết hợp với chiến lược trọng số lớp (\textit{class weighting}). Mô hình thực hiện các phân tách đa tầng trên từng chiều đặc trưng của vector nhúng, thiết lập các điều kiện rẽ nhánh phức tạp để phân biệt rõ ràng giữa các cấp độ rủi ro.
+    
+    \item \textbf{XGBoost:} Triển khai thuật toán tăng cường gradient với mục tiêu tối ưu hóa xác suất đa lớp (\textit{multi:softprob}) cho $4$ nhãn mục tiêu. Thông qua việc học từ sai số và sử dụng hàm mất mát \textit{mlogloss}, mô hình tập trung tinh chỉnh các ranh giới tại "vùng xám", nơi các thực thể tấn công tinh vi cố gắng mô phỏng đặc trưng của nhóm an toàn. Việc sử dụng trọng số mẫu (\textit{sample weights}) trong quá trình huấn luyện giúp XGBoost nâng cao khả năng phân loại các mức độ rủi ro.
+\end{itemize}

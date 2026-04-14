@@ -1,8 +1,36 @@
-\subsubsection{1.1. Quy trình xây dựng dữ liệu đồ thị đa tầng nhận thức ràng buộc}
+\subsubsection{1.1. Phân hệ học biểu diễn và gán nhãn}
 
-\indent\indent Trước khi đưa vào huấn luyện các mô hình học sâu đồ thị, dữ liệu thô từ mạng xã hội phi tập trung cần trải qua một quy trình tiền xử lý phức tạp. Mục tiêu của giai đoạn này là chuyển đổi các bản ghi cơ sở dữ liệu phẳng thành một cấu trúc đồ thị đa quan hệ có hướng, trong đó mỗi nút và cạnh đều mang lượng thông tin ngữ nghĩa và toán học cao nhất.\vspace{0.3cm}
+\indent\indent Quy trình của phân hệ này được minh họa tại \textbf{Hình \ref{fig:DataPipeline}}, tập trung vào việc học biểu diễn không gian tiềm ẩn, tự động hóa khâu gán nhãn nhằm giải quyết sự thiếu hụt dữ liệu huấn luyện.
 
-\indent Sơ đồ luồng xử lý thu thập và kiến tạo đồ thị được minh họa tại \textbf{Hình \ref{fig:GraphBuilder}}, bao gồm hai nhánh xử lý song song và cơ chế hoạt động như sau:
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=\linewidth]{images/part-02/chap-02/sec-01/DataPipeline.png}
+    \vspace{0.1cm}
+    \caption{Sơ đồ kiến trúc luồng học biểu diễn và gán nhãn}
+    \label{fig:DataPipeline}
+\end{figure}
+
+\textbf{Đặc tả dữ liệu:}
+\begin{itemize}[label={--}, itemsep=1pt]
+    \item \textbf{Đầu vào:} Một khoảng thời gian cụ thể. Hệ thống sẽ dựa vào khoảng thời gian này để truy xuất dữ liệu lịch sử hàng loạt từ Lens Protocol thông qua BigQuery (bao gồm thông tin các tài khoản, số liệu thống kê và các bản ghi tương tác).
+    \item \textbf{Đầu ra:} Một tập dữ liệu đồ thị có nhãn, sẵn sàng làm nguyên liệu để huấn luyện các mô hình phân lớp.
+\end{itemize}\vspace{0.2cm}
+
+Kiến trúc tại được thiết kế nhằm tối ưu hóa sự luân chuyển thông tin qua 04 phân vùng chức năng cốt lõi:
+\begin{itemize}[label={--}, itemsep=1pt]
+    \item \textbf{Luồng tích hợp đa nguồn:} Dữ liệu từ Lens Protocol được xử lý song song để tạo ra vector đặc trưng nút $396$ chiều. Thiết kế này đảm bảo sự hội tụ giữa ngữ nghĩa văn bản và hành vi định lượng trước khi bước vào không gian đồ thị.
+    \item \textbf{Luồng nén và trích xuất đặc trưng:} Kế thừa cơ chế Encoder-Decoder của GAE tại Chương 1, đồ thị đa tầng được đưa qua mạng GATv2 để nén cấu trúc. Quá trình này giúp lọc nhiễu và trích xuất các đặc trưng cấu trúc cô đọng nhất dưới dạng các vector tiềm ẩn.
+    \item \textbf{Luồng gán nhãn giả lập:} Dựa trên các vector đã nén, hệ thống thực hiện phân tách không gian bằng K-Means. Điểm nhấn trong thiết kế này là sự kết hợp với hệ luật chuyên gia để ánh xạ điểm rủi ro thành nhãn, hoàn tất quy trình tự động hóa khâu chuẩn bị dữ liệu giám sát mà không cần can thiệp thủ công.
+\end{itemize}
+
+%=============================================================================
+
+\textit{1.1.1. Quy trình xây dựng CMG}\vspace{0.2cm}
+
+Trước khi đưa vào huấn luyện các mô hình học sâu đồ thị, dữ liệu thô từ mạng xã hội phi tập trung cần trải qua một quy trình tiền xử lý phức tạp. Mục tiêu của giai đoạn này là chuyển đổi các bản ghi cơ sở dữ liệu phẳng thành một cấu trúc đồ thị đa quan hệ có hướng, trong đó mỗi nút và cạnh đều mang lượng thông tin ngữ nghĩa và toán học cao nhất.\vspace{0.3cm}
+
+Sơ đồ luồng xử lý thu thập và kiến tạo đồ thị được minh họa tại \textbf{Hình \ref{fig:GraphBuilder}}, bao gồm hai nhánh xử lý song song và cơ chế hoạt động như sau:
+
 \begin{figure}[H]
     \centering
     \includegraphics[width=\linewidth]{images/part-02/chap-02/sec-01/BuildMLG.png}
@@ -15,7 +43,7 @@
 
 \textbf{Đầu ra:} Một đồ thị đa quan hệ hoàn chỉnh, được đóng gói dưới dạng đối tượng \texttt{Data} của thư viện PyTorch Geometric.\vspace{0.3cm}
 
-\textbf{Quy trình xử lý:}\vspace{-0.1cm}
+\textbf{Quy trình xử lý:}
 \begin{itemize}[label={--}, itemsep=3pt]
     \item \textbf{Thu thập và xử lý dữ liệu nút:} Dữ liệu mô tả tài khoản được chia làm hai nhánh trích xuất đặc trưng độc lập trước khi tiến hành hợp nhất:
     \begin{itemize}[label={+}, itemsep=3pt]
@@ -24,7 +52,7 @@
         \item \textit{Hợp nhất:} Tạo thành vector đặc trưng nút toàn diện với kích thước 396 chiều.
     \end{itemize}
 
-    \item \textbf{Thu thập và xử lý dữ liệu quan hệ:} Kế thừa lý thuyết về Đồ thị đa quan hệ nhận thức ràng buộc đã được định nghĩa tại Mục 2.2 (Chương 1). Để tối ưu hóa không gian biểu diễn và khắc phục vấn đề phân mảnh dữ liệu, toàn bộ 14 loại quan hệ tương tác gốc từ dữ liệu chuỗi khối được hệ thống phân tích, ánh xạ và hợp nhất về mặt ngữ nghĩa thành 04 tầng đồ thị chính. Bảng \ref{tab:edge_mapping} trình bày chi tiết quy trình gom nhóm này:
+    \item \textbf{Thu thập và xử lý dữ liệu quan hệ:} Kế thừa lý thuyết về Đồ thị đa quan hệ nhận thức ràng buộc đã được định nghĩa tại Mục 2.2 (Chương 1). Để tối ưu hóa không gian biểu diễn và khắc phục vấn đề phân mảnh dữ liệu, toàn bộ 14 loại quan hệ tương tác gốc từ dữ liệu chuỗi khối được hệ thống phân tích, ánh xạ và hợp nhất về mặt ngữ nghĩa thành 04 tầng đồ thị chính. Bảng \ref{tab:edge_mapping} trình bày chi tiết quy trình gom nhóm này.
 
     \begin{table}[H]
         \centering
@@ -58,3 +86,97 @@
     
     \item \textbf{Đóng gói thành Đồ thị đa quan hệ:} Các định danh tài khoản được ánh xạ tuần tự thành các chỉ mục số nguyên. Cuối cùng, toàn bộ dữ liệu được đóng gói thành đối tượng đồ thị chuẩn của thư viện PyTorch Geometric, bao gồm: ma trận đặc trưng nút \texttt{x}, ma trận liên kết \texttt{edge\_index}, vector trọng số \texttt{edge\_attr} và vector chỉ mục phân loại 14 loại cạnh \texttt{edge\_type}.
 \end{itemize}
+
+%=============================================================================
+
+\textit{1.1.2. Kiến trúc GAE + GATv2}\vspace{0.2cm}
+
+Với cơ sở toán học của bộ mã hóa đồ thị đã được thiết lập tại Mục 2.4 (Chương 1), phần này đi sâu vào việc cấu hình tham số mạng thực tế nhằm tối ưu hóa khả năng nén đặc trưng cấu trúc. Để thực hiện hạ chiều từ vector đặc trưng nút 396 chiều gốc, bộ mã hóa được thiết kế với cấu trúc GATv2 hai tầng ẩn. Quá trình này thực hiện hạ chiều dữ liệu tuần tự về 32 chiều và cuối cùng là 16 chiều trong không gian tiềm ẩn, đảm bảo sự cân bằng giữa tính cô đọng dữ liệu và tính bảo toàn các ràng buộc đồ thị đa quan hệ.\vspace{0.3cm}
+
+Kiến trúc chi tiết của mô hình GAE được minh họa tại \textbf{Hình \ref{fig:GAEPipeline}}. Mô hình được thiết kế với hai thành phần cốt lõi: Bộ mã hóa và Bộ giải mã.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.5\linewidth]{images/part-02/chap-02/sec-01/GAEPipeline.png}
+    \vspace{0.2cm}
+    \caption{Kiến trúc Mạng tự mã hóa đồ thị với bộ mã hóa GATv2}
+    \label{fig:GAEPipeline}
+\end{figure}
+
+Hệ thống sử dụng Mạng nơ-ron tích chập đồ thị có cơ chế chú ý nâng cao (\textit{GATv2}) làm bộ mã hóa. Đặc biệt, bộ mã hóa được thiết kế để duy trì cơ chế Điều hướng chú ý thông qua tham số \texttt{edge\_dim=1}, giúp hấp thụ trực tiếp các trọng số cạnh đã được chuẩn hóa Logarit ở giai đoạn trước vào mọi bước nhảy lan truyền.\vspace{0.3cm}
+
+Chi tiết luồng xử lý qua các tầng của bộ mã hóa được minh họa tại \textbf{Hình \ref{fig:GATEncoder}}:
+\begin{figure}[H]
+    \centering
+    % Đổi tên file ảnh dưới đây cho khớp với sơ đồ GAT Encoder bạn vừa vẽ
+    \includegraphics[width=0.5\linewidth]{images/part-02/chap-02/sec-01/GATEncoder.png}
+    \vspace{0.2cm}
+    \caption{Kiến trúc luồng dữ liệu bên trong Bộ mã hóa GATv2}
+    \label{fig:GATEncoder}
+\end{figure}
+
+Kiến trúc mã hóa bao gồm hai tầng tích chập:
+\begin{itemize}[label={--}, itemsep=3pt]
+    \item \textbf{Tầng tích chập thứ nhất (Conv1):} Nhận đầu vào là ma trận đặc trưng $X \in \mathbb{R}^{N \times 396}$. Tầng này sử dụng cơ chế đa chú ý với $4$ heads nhằm khai phá đặc trưng dưới nhiều không gian biểu diễn khác nhau. Mỗi head ánh xạ dữ liệu thành không gian $32$ chiều. Các kết quả sau đó được ghép nối lại, tạo ra vector trung gian có kích thước $128$ chiều ($32 \times 4$). Đầu ra đi qua hàm kích hoạt phi tuyến ELU và một lớp Dropout với tỷ lệ $0.1$ nhằm ngăn chặn over-fitting.
+    \item \textbf{Tầng tích chập thứ hai (Conv2):} Nhận vector $128$ chiều làm đầu vào và thiết lập cơ chế chú ý đơn ($1$ head). Cấu hình này ép buộc mô hình tổng hợp các góc nhìn từ tầng trước để nén thông tin thành vector tiềm ẩn cuối cùng $Z \in \mathbb{R}^{N \times 16}$.
+\end{itemize}
+
+Thay vì sử dụng một mạng nơ-ron phức tạp, bộ giải mã của GAE tính toán tích vô hướng giữa các vector embedding của các cặp nút ($Z_i \cdot Z_j$) để dự đoán xác suất tồn tại của một cạnh nối giữa chúng. Đầu ra của hệ thống được đánh giá thông qua hàm lỗi tái tạo dựa trên Binary Cross-Entropy (BCE). Khung học không giám sát này sẽ liên tục sử dụng sai số tái tạo để lan truyền ngược, ép các trọng số của GATv2 phải điều chỉnh sao cho đồ thị tái tạo từ không gian tiềm ẩn gần giống nhất với đồ thị đa quan hệ gốc ban đầu.\vspace{0.3cm}
+
+\textbf{Đầu ra cuối cùng:} Sau khi kết thúc quá trình tối ưu hóa, mô hình trích xuất ma trận có kích thước $N \times 16$. Ma trận này chứa đựng toàn bộ tri thức về cấu trúc mạng lưới của đồ thị, đóng vai trò là đầu vào tiên quyết cho quy trình phân cụm và gán nhãn giả lập phía sau.\vspace{0.3cm}
+
+%=============================================================================
+
+\textit{1.1.3. Gom cụm và gán nhãn}\vspace{0.2cm}
+
+Sau khi trích xuất được các vector biểu diễn của các nút trong đồ thị từ GAE, hệ thống thực hiện quy trình gán nhãn giả lập. Mục tiêu cốt lõi của giai đoạn này là hiện thực hóa hệ thống luật chuyên gia đã đề xuất tại Chương 1 thành một quy trình xử lý dữ liệu tự động, kiến tạo tập dữ liệu có nhãn phục vụ cho các pha huấn luyện có giám sát tiếp theo.\vspace{0.3cm}
+
+Quy trình thực thi tổng quát được minh họa tại \textbf{Hình \ref{fig:ClusterAndPseudoPipeline}}, tập trung vào luồng biến đổi từ vector embedding sang các thực thể có nhãn định danh:
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=\linewidth]{images/part-02/chap-02/sec-01/ClusterAndPseudoPipeline.png}
+    \vspace{0.1cm}
+    \caption{Quy trình thực thi gán nhãn giả lập tổng quát}
+    \label{fig:ClusterAndPseudoPipeline}
+\end{figure}
+
+\textbf{* Tối ưu hóa phân cụm K-Means}\vspace{0.2cm}
+
+Hệ thống triển khai quy trình tìm kiếm tham số tối ưu tự động thay vì sử dụng một giá trị $K$ cố định nhằm thích ứng với các quy mô dữ liệu theo Tuần, Tháng và Quý. Giá trị $K$ được xác định dựa trên sự hội tụ của hệ số Silhouette và chỉ số Davies-Bouldin, đảm bảo các nhóm hành vi Sybil được cô lập chặt chẽ trong không gian tiềm ẩn trước khi tiến hành định lượng rủi ro.\vspace{0.3cm}
+
+\textbf{* Hệ thống định lượng rủi ro dựa trên ràng buộc}\vspace{0.2cm}
+
+Tại bước này, hệ thống thực hiện tính toán các chỉ số thống kê đặc trưng cho từng cụm. Dữ liệu từ các cạnh nội bộ của các cụm được lọc và định lượng dựa trên cường độ liên kết và mật độ vi phạm. Chi tiết cơ chế kiểm tra điều kiện song song và tổng hợp điểm rủi ro được minh họa tại \textbf{Hình \ref{fig:ScoringLogic}}.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=\linewidth]{images/part-02/chap-02/sec-01/Scoring.png}
+    \vspace{0.2cm}
+    \caption{Cơ chế kiểm tra điều kiện song song và tổng hợp điểm rủi ro}
+    \label{fig:ScoringLogic}
+\end{figure}
+
+Hệ thống vận hành 6 quy tắc kiểm tra song song, bao gồm việc tính toán tỷ trọng cạnh Đồng sở hữu, Tương đồng hành vi, Tương tác xã hội và điểm uy tín trung bình. Đặc biệt, mật độ vi phạm tương đồng định danh được kiểm tra để tăng độ chính xác trong nhận diện. Tổng điểm rủi ro $S_{risk}$ cuối cùng được chuẩn hóa qua hàm giới hạn $min(Score, 100)$.\vspace{0.3cm}
+
+\textbf{* Cơ chế phân lớp mờ}\vspace{0.2cm}
+
+Kế thừa bản chất định nghĩa của 04 nhóm rủi ro đã được phân tích lý thuyết tại Mục 2.5 (Chương 1), phân hệ này tiến hành cài đặt hàm phân ngưỡng mờ. Cụ thể, điểm rủi ro liên tục ($0-100$) tổng hợp từ hệ luật chuyên gia được ánh xạ cứng thành các nhãn rời rạc thông qua cấu hình tham số thực tế như sau:
+\begin{itemize}[label={--}, itemsep=1pt]
+    \item \texttt{Risk Score} $\leq 20$: Phân loại \textbf{BENIGN}
+    \item $20 <$ \texttt{Risk Score} $\leq 50$: Phân loại \textbf{LOW\_RISK}
+    \item $50 <$ \texttt{Risk Score} $\leq 80$: Phân loại \textbf{HIGH\_RISK}
+    \item \texttt{Risk Score} $> 80$: Phân loại \textbf{MALICIOUS}
+\end{itemize}
+
+Quy trình ánh xạ và đồng bộ hóa nhãn cho toàn bộ các tài khoản nội cụm được minh họa chi tiết tại \textbf{Hình \ref{fig:LabelingLogic}}.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=\linewidth]{images/part-02/chap-02/sec-01/Labeling.png}
+    \vspace{0.2cm}
+    \caption{Cơ chế phân lớp mờ và đồng bộ hóa nhãn nội cụm}
+    \label{fig:LabelingLogic}
+\end{figure}
+
+Điểm nổi bật của quy trình là tính giải thích, khi mỗi nhãn dán đều được đính kèm các lý do vi phạm thu được từ bước chấm điểm trước đó. Kết quả đầu ra là một tập dữ liệu có cấu trúc hoàn chỉnh, đóng vai trò là tín hiệu giám sát để tối ưu hóa hàm mục tiêu cho các mô hình GNN và kiến trúc Decoupled ML ở các bước tiếp theo.

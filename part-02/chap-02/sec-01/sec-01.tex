@@ -1,59 +1,6 @@
 \subsection{1. Thiết kế hệ thống}
 
-\indent\indent Quy trình tổng quát của hệ thống SybilSignal được thiết kế nhằm giải quyết bài toán phát hiện tài khoản giả mạo thông qua hai phân hệ chính hoạt động bổ trợ lẫn nhau: \textit{Phân hệ học biểu diễn và gán nhãn} chịu trách nhiệm kiến tạo dữ liệu và gán nhãn tự động; và \textit{Phân hệ đánh giá rủi ro} thực hiện nhiệm vụ dự đoán và diễn giải kết quả theo thời gian thực.\vspace{0.3cm}
-    
-\textit{1.1. Luồng dữ liệu Phân hệ học biểu diễn và gán nhãn}\vspace{0.3cm}
-
-Quy trình của phân hệ này được minh họa tại \textbf{Hình \ref{fig:DataPipeline}}, tập trung vào việc học biểu diễn không gian tiềm ẩn, tự động hóa khâu gán nhãn nhằm giải quyết sự thiếu hụt dữ liệu huấn luyện.
-
-\begin{figure}[H]
-    \centering
-    \includegraphics[width=\linewidth]{images/part-02/chap-02/sec-01/DataPipeline.png}
-    \vspace{0.1cm}
-    \caption{Sơ đồ kiến trúc luồng học biểu diễn và gán nhãn}
-    \label{fig:DataPipeline}
-\end{figure}
-
-\textbf{Đặc tả dữ liệu:}
-\begin{itemize}[label={--}, itemsep=1pt]
-    \item \textbf{Đầu vào:} Một khoảng thời gian cụ thể. Hệ thống sẽ dựa vào khoảng thời gian này để truy xuất dữ liệu lịch sử hàng loạt từ Lens Protocol thông qua BigQuery (bao gồm thông tin các tài khoản, số liệu thống kê và các bản ghi tương tác).
-    \item \textbf{Đầu ra:} Một tập dữ liệu đồ thị có nhãn, sẵn sàng làm nguyên liệu để huấn luyện các mô hình phân lớp.
-\end{itemize}\vspace{0.2cm}
-
-Kiến trúc tại được thiết kế nhằm tối ưu hóa sự luân chuyển thông tin qua 04 phân vùng chức năng cốt lõi:
-\begin{itemize}[label={--}, itemsep=1pt]
-    \item \textbf{Luồng tích hợp đa nguồn:} Dữ liệu từ Lens Protocol được xử lý song song để tạo ra vector đặc trưng nút $396$ chiều. Thiết kế này đảm bảo sự hội tụ giữa ngữ nghĩa văn bản và hành vi định lượng trước khi bước vào không gian đồ thị.
-    \item \textbf{Luồng nén và trích xuất đặc trưng:} Kế thừa cơ chế Encoder-Decoder của GAE tại Chương 1, đồ thị đa tầng được đưa qua mạng GATv2 để nén cấu trúc. Quá trình này giúp lọc nhiễu và trích xuất các đặc trưng cấu trúc cô đọng nhất dưới dạng các vector tiềm ẩn.
-    \item \textbf{Luồng gán nhãn giả lập:} Dựa trên các vector đã nén, hệ thống thực hiện phân tách không gian bằng K-Means. Điểm nhấn trong thiết kế này là sự kết hợp với hệ luật chuyên gia để ánh xạ điểm rủi ro thành nhãn, hoàn tất quy trình tự động hóa khâu chuẩn bị dữ liệu giám sát mà không cần can thiệp thủ công.
-\end{itemize}
-
-\textit{1.2. Luồng dữ liệu Phân hệ Đánh giá rủi ro}\vspace{0.2cm}
-
-Luồng suy diễn trực tuyến dành cho người dùng cuối được minh họa tại \textbf{Hình \ref{fig:PredictionPipeline}}. Phân hệ này được thiết kế ưu tiên về tốc độ phản hồi và cho phép tích hợp linh hoạt các mô hình dự đoán tối ưu nhất.
-
-\begin{figure}[H]
-    \centering
-    \includegraphics[width=\linewidth]{images/part-02/chap-02/sec-01/PredictionPipeline.png}
-    \vspace{0.1cm}
-    \caption{Sơ đồ kiến trúc luồng đánh giá rủi ro}
-    \label{fig:PredictionPipeline}
-\end{figure}
-
-\textbf{Đặc tả dữ liệu:}
-\begin{itemize}[label={--}, itemsep=1pt]
-    \item \textbf{Đầu vào:} \textit{Profile ID} (Định danh duy nhất của tài khoản trên nền tảng Lens Protocol) do người dùng hoặc hệ thống truyền vào để yêu cầu kiểm tra mức độ rủi ro Sybil.
-    \item \textbf{Đầu ra:} Phán quyết cuối cùng phân loại tài khoản vào một trong bốn nhãn: \texttt{BENIGN}, \texttt{LOW\_RISK}, \texttt{HIGH\_RISK}, hoặc \texttt{MALICIOUS}.
-\end{itemize}\vspace{0.2cm}
-
-Kiến trúc thực thi được tối ưu để xử lý các yêu cầu truy vấn đơn lẻ với độ trễ thấp thông qua ba bước chuyển đổi dữ liệu:
-\begin{itemize}[label={--}, itemsep=1pt]
-    \item \textbf{Cơ chế truy xuất và định tuyến:} Hệ thống ưu tiên truy xuất đồ thị tham chiếu có sẵn để giảm thiểu tài nguyên. Đối với tài khoản mới, luồng dữ liệu được định tuyến qua API Lens Protocol để thu thập thông tin tức thời.
-    \item \textbf{Thiết kế đồ thị cục bộ:} Thay vì xử lý toàn bộ đồ thị khổng lồ, hệ thống chỉ tái tạo mạng lưới lân cận của \textit{Profile ID} mục tiêu. Thiết kế này giúp khoanh vùng bối cảnh cấu trúc mạng cần thiết, đảm bảo tính giải thích dựa trên các nút láng giềng.
-    \item \textbf{Thực thi dự đoán tách rời:} Luồng dữ liệu cuối cùng được đưa qua lõi dự đoán đã được huấn luyện sẵn. Vector tiềm ẩn từ bộ mã hóa GNN sẽ được đưa vào mô hình phân lớp để xuất ra phán quyết rủi ro cuối cùng theo thời gian thực.
-\end{itemize}
+\indent\indent Quy trình tổng quát của hệ thống \textit{SybilSignal} được thiết kế nhằm giải quyết bài toán phát hiện tài khoản giả mạo thông qua hai phân hệ chính hoạt động bổ trợ lẫn nhau: \textit{Phân hệ học biểu diễn và gán nhãn} chịu trách nhiệm kiến tạo dữ liệu và gán nhãn tự động; và \textit{Phân hệ đánh giá rủi ro} thực hiện nhiệm vụ dự đoán và diễn giải kết quả theo thời gian thực.
 
 \input{part-02/chap-02/sec-01/subsec-01/subsec-01}
 \input{part-02/chap-02/sec-01/subsec-02/subsec-02}
-\input{part-02/chap-02/sec-01/subsec-03/subsec-03}
-\input{part-02/chap-02/sec-01/subsec-04/subsec-04}
-\input{part-02/chap-02/sec-01/subsec-05/subsec-05}
