@@ -1,6 +1,18 @@
 \subsection{1. Thiết kế hệ thống}
 
-\indent\indent Quy trình tổng quát của hệ thống \textit{SybilSignal} được thiết kế nhằm giải quyết bài toán phát hiện tài khoản giả mạo thông qua hai phân hệ chính hoạt động bổ trợ lẫn nhau: \textit{Phân hệ học biểu diễn và gán nhãn} chịu trách nhiệm kiến tạo dữ liệu và gán nhãn tự động; và \textit{Phân hệ đánh giá rủi ro} thực hiện nhiệm vụ dự đoán và diễn giải kết quả theo thời gian thực.
+\indent\indent Quy trình tổng quát của hệ thống \textit{SybilSignal} được thiết kế nhằm giải quyết bài toán phát hiện tài khoản giả mạo thông qua hai phân hệ chính hoạt động bổ trợ lẫn nhau: \textit{Phân hệ học biểu diễn và gán nhãn} chịu trách nhiệm kiến tạo dữ liệu và gán nhãn tự động; và \textit{Phân hệ đánh giá rủi ro} thực hiện nhiệm vụ dự đoán và diễn giải kết quả theo thời gian thực.\vspace{0.3cm}
+
+Kiến trúc tổng thể và luồng xử lý dữ liệu khép kín giữa các module được minh họa trực quan tại \textbf{Hình \ref{fig:SystemOverview}}.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.8\linewidth]{images/part-02/chap-02/sec-01/SystemOverview.png} 
+    \vspace{0.1cm}
+    \caption{Sơ đồ kiến trúc tổng thể của hệ thống SybilSignal}
+    \label{fig:SystemOverview}
+\end{figure}
+
+Dựa trên sơ đồ kiến trúc này, nội dung các phần tiếp theo sẽ đi sâu vào đặc tả chi tiết quy trình thiết kế, cơ sở toán học và cấu hình kỹ thuật của từng phân hệ thành phần.
 
 \input{part-02/chap-02/sec-01/subsec-01/subsec-01}
 \input{part-02/chap-02/sec-01/subsec-02/subsec-02}
