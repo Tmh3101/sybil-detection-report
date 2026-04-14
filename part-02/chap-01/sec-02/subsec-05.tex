@@ -9,9 +9,9 @@ Nghiên cứu sử dụng thuật toán K-Means \cite{macqueen1967some} để ph
 Khác với các phương pháp thử sai truyền thống trên một không gian tham số vô hạn, nghiên cứu đề xuất chiến lược khoanh vùng không gian tìm kiếm cho số lượng cụm $K$ dựa trên lý thuyết cấu trúc cộng đồng trong mạng quy mô lớn của Leskovec và cộng sự \cite{leskovec2009community}. Theo đó, đồ thị mạng xã hội thường tuân theo cấu trúc \textit{Core-Whisker}, trong đó phần lõi đặc chiếm khoảng $60\%$ tổng số nút, và $40\%$ còn lại phân tán thành các cộng đồng nhỏ ở rìa.\vspace{0.3cm}
 
 Áp dụng nguyên lý này vào bài toán hiện tại, hệ thống thiết lập giả thuyết rằng các mạng lưới Sybil thường hoạt động thành các nhóm nhỏ. Dựa trên quy mô $N$ của từng tập dữ liệu, không gian tìm kiếm tham số $K$ tối ưu được hệ thống ước lượng trước thông qua công thức định hướng:
-\begin{equation}
+\[
     K_{search} \approx \frac{\rho \cdot N}{k_{target}}
-\end{equation}
+\]
 
 Trong đó:
 \begin{itemize}[label={--}, itemsep=1pt]
@@ -62,10 +62,13 @@ Chi tiết các tiêu chí vi phạm và trọng số điểm phạt được tr
     \end{tabular}
 \end{table}
 
-Tổng điểm rủi ro của một cụm $C$ được tổng hợp từ các lỗi vi phạm và tính toán thông qua hàm giới hạn trần để đảm bảo điểm không vượt quá ngưỡng tối đa:\vspace{-0.1cm}
-\[
+Tổng điểm rủi ro của một cụm $C$ được tổng hợp từ các lỗi vi phạm và tính toán thông qua hàm giới hạn trần để đảm bảo điểm không vượt quá ngưỡng tối đa:\vspace{0.2cm}
+
+\begin{center}
+\(
     \text{S}_{\text{risk}}(C) = \min \left( \sum_{i=1}^{n} \text{Rule}_i, 100 \right)
-\]
+\)
+\end{center}
 
 %=============================================================
 
