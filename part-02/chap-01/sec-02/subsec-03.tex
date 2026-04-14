@@ -163,7 +163,7 @@ Trong kiến trúc đồ thị đa quan hệ có trọng số, các thực thể
             \end{center}
             Đặc trưng láng giềng $h_j$ buộc phải ghép nối và hòa trộn với $w_{ij}$ thành thông điệp hợp nhất trước khi đi qua khối thống kê $\bigoplus$. Nhờ vậy, độ lệch chuẩn ($\sigma$) sinh ra từ $\bigoplus$ chuyển sang đo lường sự biến thiên của lịch sử tương tác, một chỉ báo nhạy bén để bắt các mạng lưới Sybil có các hành vi rập khuôn.
 
-            \item \textbf{Graph Transformer Networks:} Để đối phó với kịch bản tấn công sao chép - nơi bot có vector hồ sơ giống hệt người thật. Kế thừa cơ chế của mạng UniMP, hệ thống tiêm trực tiếp trọng số $w_{ij}$ vào cả ma trận Khóa (\textit{Key}) và Giá trị (\textit{Value}). Công thức tổng hợp láng giềng được cập nhật thành:
+            \item \textbf{Graph Transformer Networks:} Để đối phó với kịch bản tấn công sao chép. Kế thừa cơ chế của mạng UniMP, hệ thống tiêm trực tiếp trọng số $w_{ij}$ vào cả ma trận Khóa (\textit{Key}) và Giá trị (\textit{Value}). Công thức tổng hợp láng giềng được cập nhật thành:
             \begin{center}
             \(
                 h_i^{(l+1)} = \sum_{j \in \mathcal{N}(i)} \alpha_{ij} \left( \mathbf{W}_v h_j^{(l)} + \mathbf{W}_e w_{ij} \right)
