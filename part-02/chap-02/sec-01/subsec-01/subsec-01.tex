@@ -161,21 +161,32 @@ Hệ thống vận hành 6 quy tắc kiểm tra song song, bao gồm việc tín
 
 \textbf{* Cơ chế phân lớp mờ}\vspace{0.2cm}
 
-Kế thừa bản chất định nghĩa của 04 nhóm rủi ro đã được phân tích lý thuyết tại Mục 2.5 (Chương 1), phân hệ này tiến hành cài đặt hàm phân ngưỡng mờ. Cụ thể, điểm rủi ro liên tục ($0-100$) tổng hợp từ hệ luật chuyên gia được ánh xạ cứng thành các nhãn rời rạc thông qua cấu hình tham số thực tế như sau:
+Kế thừa bản chất định nghĩa của 04 nhóm rủi ro đã được phân tích lý thuyết tại Mục 2.5 (Chương 1), phân hệ này tiến hành cài đặt hàm phân ngưỡng mờ. Điểm đặc thù của mạng lưới Web3 là ranh giới giữa người dùng thật và các tài khoản Sybil tinh vi thường không rõ ràng, tạo ra các vùng giao thoa hành vi. \vspace{0.3cm}
+
+Để giải quyết vấn đề này, điểm rủi ro liên tục ($0-100$) tổng hợp từ hệ luật chuyên gia được phân phối qua các hàm liên thuộc (Membership Functions) và ánh xạ cứng thành các nhãn rời rạc. Cấu hình tham số cắt ngưỡng thực tế được minh họa trực quan tại \textbf{Hình \ref{fig:FuzzyDistribution}} và liệt kê cụ thể như sau:
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=\linewidth]{images/part-02/chap-02/sec-01/FuzzyLabelingDistribution.png}
+    \caption{Trực quan hóa sự giao thoa hành vi và các ngưỡng phân lớp mờ}
+    \vspace{0.1cm}
+    \label{fig:FuzzyDistribution}
+\end{figure}
+\vspace{0.3cm}
 \begin{itemize}[label={--}, itemsep=1pt]
-    \item \texttt{Risk Score} $\leq 20$: Phân loại \textbf{BENIGN}
-    \item $20 <$ \texttt{Risk Score} $\leq 50$: Phân loại \textbf{LOW\_RISK}
-    \item $50 <$ \texttt{Risk Score} $\leq 80$: Phân loại \textbf{HIGH\_RISK}
-    \item \texttt{Risk Score} $> 80$: Phân loại \textbf{MALICIOUS}
+    \item \texttt{Risk Score} $\leq 20$: Phân loại \texttt{BENIGN} (Vùng an toàn, đỉnh phân phối của người dùng thật).
+    \item $20 <$ \texttt{Risk Score} $\leq 50$: Phân loại \texttt{LOW\_RISK} (Vùng đáng ngờ nhẹ, độ giao thoa thấp).
+    \item $50 <$ \texttt{Risk Score} $\leq 80$: Phân loại \texttt{HIGH\_RISK} (Vùng rủi ro cao, hành vi ngụy trang của lính ảo).
+    \item \texttt{Risk Score} $> 80$: Phân loại \texttt{MALICIOUS} (Vùng vi phạm rõ rệt của mạng lưới Sybil).
 \end{itemize}
 
-Quy trình ánh xạ và đồng bộ hóa nhãn cho toàn bộ các tài khoản nội cụm được minh họa chi tiết tại \textbf{Hình \ref{fig:LabelingLogic}}.
+Quy trình ánh xạ và đồng bộ hóa nhãn cho toàn bộ các tài khoản nội cụm (Cluster Label Synchronization) sau đó được thực thi thông qua hệ thống đường ống (\textit{pipeline}) minh họa tại \textbf{Hình \ref{fig:LabelingLogic}}.
 
 \begin{figure}[H]
     \centering
     \includegraphics[width=\linewidth]{images/part-02/chap-02/sec-01/Labeling.png}
     \vspace{0.2cm}
-    \caption{Cơ chế phân lớp mờ và đồng bộ hóa nhãn nội cụm}
+    \caption{Quy trình đồng bộ hóa nhãn nội cụm và đính kèm lưu vết vi phạm}
     \label{fig:LabelingLogic}
 \end{figure}
 
