@@ -6,7 +6,7 @@
 
 Quá trình bắt đầu bằng việc xây dựng dữ liệu định danh từ các trường \texttt{handle}, \texttt{display\_name} và \texttt{bio}, được ghép nối theo cấu trúc: \texttt{"Handle: \{h\}. Name: \{n\}. Bio: \{b\}"}. Bằng cách giữ nguyên ngữ cảnh tự nhiên và các ký tự đặc biệt, đề tài sử dụng mô hình \textit{all-MiniLM-L6-v2} để ánh xạ chuỗi văn bản thành vector ngữ nghĩa 384 chiều.\vspace{0.3cm}
 
-Song song đó, 12 chỉ số hành vi định lượng — bao gồm cường độ tương tác nội dung, điểm tin cậy trên nền tảng và thời gian hoạt động — được trích xuất để mô tả đặc tính của nút. Các giá trị thiếu (\textit{NULL}) được mặc định gán bằng \textit{0}. Kết quả phân tích trên phạm vi dữ liệu Quý tại \textbf{Hình \ref{fig:FeatureCorrelation}} minh chứng bộ đặc trưng này có độ bao phủ thông tin tốt. Mặc dù tồn tại sự tương quan cao giữa các hành vi cùng nhóm (như \texttt{total\_posts} và \texttt{total\_comments} với $r=0.86$), phần lớn các chỉ số còn lại đều duy trì tính độc lập cao.
+Song song đó, 12 chỉ số hành vi định lượng, bao gồm cường độ tương tác nội dung, điểm tin cậy trên nền tảng và thời gian hoạt động, được trích xuất để mô tả đặc tính của nút. Các giá trị thiếu (\textit{NULL}) được mặc định gán bằng \textit{0}. Kết quả phân tích trên phạm vi dữ liệu Quý tại \textbf{Hình \ref{fig:FeatureCorrelation}} minh chứng bộ đặc trưng này có độ bao phủ thông tin tốt. Mặc dù tồn tại sự tương quan cao giữa các hành vi cùng nhóm (như \texttt{total\_posts} và \texttt{total\_comments} với $r=0.86$), phần lớn các chỉ số còn lại đều duy trì tính độc lập cao.
 
 \begin{figure}[H]
     \centering
