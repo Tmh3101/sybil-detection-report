@@ -117,7 +117,14 @@ Từ \textbf{Hình \ref{fig:DecoupledHeatmap}}, có thể rút ra những phân 
     \end{tabular}
 \end{table}
 
-Dữ liệu thực nghiệm từ \textbf{Bảng \ref{tab:HeadToHead}} bộc lộ một xu hướng dịch chuyển hiệu năng vô cùng đáng chú ý liên quan đến quy mô của đồ thị:
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=\linewidth]{images/part-02/chap-03/sec-02/HeadToHeadComparison.png}
+    \caption{Biểu đồ so sánh hiệu năng giữa GATv2 (Baseline) và GATv2 + RF}
+    \label{fig:HeadToHeadComparison}
+\end{figure}
+
+Dữ liệu thực nghiệm từ \textbf{Bảng \ref{tab:HeadToHead}} và được trực quan hóa tại \textbf{Hình \ref{fig:HeadToHeadComparison}} bộc lộ một xu hướng dịch chuyển hiệu năng đáng chú ý liên quan đến quy mô của đồ thị:
 
 \begin{itemize}[label={--}, itemsep=1pt]
     \item \textbf{Hiện tượng tại phạm vi Tuần (Đồ thị quy mô nhỏ):} Mô hình GATv2 cơ sở đạt kết quả nhỉnh hơn. Nguyên nhân là do ở phạm vi Tuần, cấu trúc đồ thị còn tương đối thưa thớt, các hành vi của các cụm Sybil có ranh giới rất rõ ràng. Một mạng nơ-ron sâu như GATv2 vẫn dễ dàng phân tách hoàn hảo các đặc trưng này.
